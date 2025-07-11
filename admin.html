@@ -1052,28 +1052,31 @@
 
     // ============ SYSTEM SETTINGS ============
     
-    function updateSessionSettings() {
-      const duration = document.getElementById('sessionDuration').value;
-      const warningTime = document.getElementById('warningTime').value;
-      
-      systemState.sessionSettings = {
-        duration: parseInt(duration),
-        warningTime: parseInt(warningTime)
-      };
-      
-      saveSystemState();
-      
-      // Broadcast settings update
-      if (typeof BroadcastChannel !== 'undefined') {
-        const channel = new BroadcastChannel('ltt_admin_updates');
-        channel.postMessage({
-          type: 'SESSION_SETTINGS_UPDATE',
-          data: systemState.sessionSettings
-        });
-      }
-      
-      showToast('Pengaturan session berhasil diupdate', 'success');
-    }
+   function updateSessionSettings() {
+  const duration = document.getElementById('sessionDuration').value;
+  const warningTime = document.getElementById('warningTime').value;
+  
+  systemState.sessionSettings = {
+    duration: parseInt(duration),
+    warningTime: parseInt(warningTime)
+  };
+  
+  saveSystemState();
+  
+  // TAMBAHAN: Simpan ke key yang dibaca oleh index.html
+  localStorage.setItem('ltt_session_settings', JSON.stringify(systemState.sessionSettings));
+  
+  // Broadcast settings update
+  if (typeof BroadcastChannel !== 'undefined') {
+    const channel = new BroadcastChannel('ltt_admin_updates');
+    channel.postMessage({
+      type: 'SESSION_SETTINGS_UPDATE',
+      data: systemState.sessionSettings
+    });
+  }
+  
+  showToast('Pengaturan session berhasil diupdate', 'success');
+}
 
     function updateDataSettings() {
       const syncInterval = document.getElementById('syncInterval').value;
