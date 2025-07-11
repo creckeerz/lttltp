@@ -887,47 +887,68 @@
 
     // ============ USER SESSION MANAGEMENT ============
     
-    function loadUserSessions() {
-      document.getElementById('userLoading').style.display = 'block';
-      document.getElementById('userTable').style.display = 'none';
-      
-      // Simulate loading (dalam implementasi nyata, ambil dari server)
-      setTimeout(() => {
-        const mockUsers = generateMockUserData();
-        displayUserTable(mockUsers);
-        document.getElementById('userLoading').style.display = 'none';
-        document.getElementById('userTable').style.display = 'table';
-      }, 1000);
-    }
+   function loadUserSessions() {
+  document.getElementById('userLoading').style.display = 'block';
+  document.getElementById('userTable').style.display = 'none';
+  
+  // Load real user data (small delay for UI)
+  setTimeout(() => {
+    const realUsers = generateRealUserData();
+    displayUserTable(realUsers);
+    document.getElementById('userLoading').style.display = 'none';
+    document.getElementById('userTable').style.display = 'table';
+  }, 500);
+}
 
-    function generateMockUserData() {
-      const penyuluhNames = [
-        'A.PURNAMA PUTRA', 'AAN PUJINURINSAN', 'ABDUL RAHMAN', 'AGUS SAIFUDDIN',
-        'AGUSMANTO', 'AHADI', 'ALMIZAN', 'ALWAN SASRUDIN',
-        'ANDI', 'ANDI WIHARDI', 'ANDI WILLIAM', 'ANTO SAPUTRA'
-      ];
+    // Real user session data instead of mock data
+function generateRealUserData() {
+  const users = [];
+  const now = Date.now();
+  
+  // Get all user sessions from localStorage
+  const allKeys = Object.keys(localStorage);
+  const userSessions = allKeys.filter(key => key.startsWith('ltt_session') && key !== 'ltt_admin_session');
+  
+  userSessions.forEach((key, index) => {
+    try {
+      const sessionData = JSON.parse(localStorage.getItem(key));
       
-      const users = [];
-      const now = Date.now();
-      
-      for (let i = 0; i < 8; i++) {
-        const loginTime = now - Math.random() * 4 * 60 * 60 * 1000; // Random login within 4 hours
-        const sessionExpiry = loginTime + 8 * 60 * 60 * 1000; // 8 hour session
-        const isActive = sessionExpiry > now;
+      if (sessionData && sessionData.accessCode && sessionData.expiresAt) {
+        const isActive = sessionData.expiresAt > now;
+        const timeLeft = sessionData.expiresAt - now;
         
         users.push({
-          id: `user_${i + 1}`,
-          code: `USR${String(i + 1).padStart(3, '0')}`,
-          name: penyuluhNames[i],
-          loginTime: loginTime,
-          sessionExpiry: sessionExpiry,
+          id: sessionData.accessCode,
+          code: sessionData.accessCode,
+          name: sessionData.penyuluhName || 'Unknown',
+          loginTime: sessionData.loginTime,
+          sessionExpiry: sessionData.expiresAt,
           isActive: isActive,
-          lastActivity: now - Math.random() * 30 * 60 * 1000 // Last activity within 30 min
+          lastActivity: sessionData.lastActivity || sessionData.loginTime,
+          sessionKey: key
         });
       }
-      
-      return users;
+    } catch (e) {
+      console.log('Error parsing session:', e);
     }
+  });
+  
+  // Jika tidak ada user session, tampilkan placeholder
+  if (users.length === 0) {
+    users.push({
+      id: 'no_users',
+      code: 'N/A',
+      name: 'Tidak ada user yang login',
+      loginTime: now,
+      sessionExpiry: now,
+      isActive: false,
+      lastActivity: now,
+      sessionKey: null
+    });
+  }
+  
+  return users;
+}
 
     function displayUserTable(users) {
       const tbody = document.getElementById('userTableBody');
@@ -988,47 +1009,214 @@
     }
 
     function forceLogoutUser(userId) {
-      if (confirm('Yakin ingin logout user ini?')) {
-        // Dalam implementasi nyata, kirim perintah logout ke server
-        // Dan hapus session user dari sistem
-        
-        // Simulasi broadcast logout ke user specific
-        if (typeof BroadcastChannel !== 'undefined') {
-          const channel = new BroadcastChannel('ltt_admin_updates');
-          channel.postMessage({
-            type: 'FORCE_LOGOUT',
-            data: { userId: userId }
-          });
+  if (confirm(`Yakin ingin logout user ${userId}?`)) {
+    // Hapus session user dari localStorage
+    const allKeys = Object.keys(localStorage);
+    const userSessionKeys = allKeys.filter(key => key.startsWith('ltt_session') && key !== 'ltt_admin_session');
+    
+    userSessionKeys.forEach(key => {
+      try {
+        const sessionData = JSON.parse(localStorage.getItem(key));
+        if (sessionData && sessionData.accessCode === userId) {
+          localStorage.removeItem(key);
         }
-        
-        showToast('User berhasil di-logout', 'success');
-        setTimeout(() => refreshUserData(), 1000);
+      } catch (e) {
+        console.log('Error removing session:', e);
       }
+    });
+    
+    // Broadcast logout ke user specific
+    if (typeof BroadcastChannel !== 'undefined') {
+      const channel = new BroadcastChannel('ltt_admin_updates');
+      channel.postMessage({
+        type: 'FORCE_LOGOUT',
+        data: { userId: userId }
+      });
     }
+    
+    showToast(`User ${userId} berhasil di-logout`, 'success');
+    setTimeout(() => refreshUserData(), 1000);
+  }
+}
 
     function forceLogoutAll() {
-      if (confirm('Yakin ingin logout SEMUA user? Tindakan ini tidak dapat dibatalkan.')) {
-        // Broadcast logout semua user
-        if (typeof BroadcastChannel !== 'undefined') {
-          const channel = new BroadcastChannel('ltt_admin_updates');
-          channel.postMessage({
-            type: 'FORCE_LOGOUT_ALL',
-            data: { timestamp: Date.now() }
-          });
-        }
+  if (confirm('Yakin ingin logout SEMUA user? Tindakan ini tidak dapat dibatalkan.')) {
+    // Clear semua user session di localStorage (kecuali admin)
+    const keys = Object.keys(localStorage);
+    let loggedOutCount = 0;
+    
+    keys.forEach(key => {
+      if (key.startsWith('ltt_session') && key !== 'ltt_admin_session') {
+        localStorage.removeItem(key);
+        loggedOutCount++;
+      }
+    });
+    
+    // Broadcast logout semua user
+    if (typeof BroadcastChannel !== 'undefined') {
+      const channel = new BroadcastChannel('ltt_admin_updates');
+      channel.postMessage({
+        type: 'FORCE_LOGOUT_ALL',
+        data: { timestamp: Date.now() }
+      });
+    }
+    
+    showToast(`${loggedOutCount} user berhasil di-logout`, 'warning');
+    setTimeout(() => refreshUserData(), 1000);
+  }
+}
+
+    // ============ TAMBAHAN: REAL-TIME USER MONITORING ============
+
+// Listen for user activity updates
+if (typeof BroadcastChannel !== 'undefined') {
+  const channel = new BroadcastChannel('ltt_admin_updates');
+  
+  channel.addEventListener('message', (event) => {
+    const { type, data } = event.data;
+    
+    switch (type) {
+      case 'USER_LOGIN':
+        // User baru login - update session di localStorage
+        const newSessionData = {
+          accessCode: data.accessCode,
+          penyuluhName: data.penyuluhName,
+          loginTime: data.timestamp,
+          expiresAt: data.timestamp + (8 * 60 * 60 * 1000), // 8 jam
+          role: 'user',
+          lastActivity: data.timestamp
+        };
         
-        // Clear semua session di localStorage
-        const keys = Object.keys(localStorage);
-        keys.forEach(key => {
-          if (key.startsWith('ltt_session') && key !== ADMIN_SESSION_KEY) {
-            localStorage.removeItem(key);
+        localStorage.setItem(`ltt_session_${data.accessCode}`, JSON.stringify(newSessionData));
+        
+        // Refresh user table jika sedang aktif
+        if (document.getElementById('user-sessions').classList.contains('active')) {
+          setTimeout(() => refreshUserData(), 1000);
+        }
+        break;
+        
+      case 'USER_LOGOUT':
+        // User logout - hapus dari localStorage
+        const logoutKeys = Object.keys(localStorage);
+        logoutKeys.forEach(key => {
+          if (key.startsWith('ltt_session') && key !== 'ltt_admin_session') {
+            try {
+              const sessionData = JSON.parse(localStorage.getItem(key));
+              if (sessionData && sessionData.accessCode === data.accessCode) {
+                localStorage.removeItem(key);
+              }
+            } catch (e) {
+              console.log('Error removing logout session:', e);
+            }
           }
         });
         
-        showToast('Semua user berhasil di-logout', 'warning');
-        setTimeout(() => refreshUserData(), 1000);
+        // Refresh user table jika sedang aktif
+        if (document.getElementById('user-sessions').classList.contains('active')) {
+          setTimeout(() => refreshUserData(), 1000);
+        }
+        break;
+        
+      case 'USER_ACTIVITY':
+        // Update last activity user
+        const activityKeys = Object.keys(localStorage);
+        activityKeys.forEach(key => {
+          if (key.startsWith('ltt_session') && key !== 'ltt_admin_session') {
+            try {
+              const sessionData = JSON.parse(localStorage.getItem(key));
+              if (sessionData && sessionData.accessCode === data.user) {
+                sessionData.lastActivity = data.timestamp;
+                localStorage.setItem(key, JSON.stringify(sessionData));
+              }
+            } catch (e) {
+              console.log('Error updating activity:', e);
+            }
+          }
+        });
+        break;
+        
+      case 'SUBMISSION_SUCCESS':
+      case 'SUBMISSION_FAILED':
+      case 'SUBMISSION_QUEUED':
+        // Update submission statistics
+        if (document.getElementById('data-monitoring').classList.contains('active')) {
+          loadSubmissionData();
+        }
+        break;
+    }
+  });
+}
+
+// ============ AUTO REFRESH YANG DISEMPURNAKAN ============
+
+// Auto refresh user data every 10 seconds (lebih sering untuk real-time)
+setInterval(() => {
+  if (document.getElementById('user-sessions').classList.contains('active')) {
+    refreshUserData();
+  }
+}, 10000);
+
+// Clean up expired sessions every 5 minutes
+setInterval(() => {
+  const keys = Object.keys(localStorage);
+  const now = Date.now();
+  let cleanedCount = 0;
+  
+  keys.forEach(key => {
+    if (key.startsWith('ltt_session') && key !== 'ltt_admin_session') {
+      try {
+        const sessionData = JSON.parse(localStorage.getItem(key));
+        if (sessionData && sessionData.expiresAt && now > sessionData.expiresAt) {
+          localStorage.removeItem(key);
+          cleanedCount++;
+        }
+      } catch (e) {
+        localStorage.removeItem(key);
+        cleanedCount++;
       }
     }
+  });
+  
+  if (cleanedCount > 0) {
+    console.log(`Cleaned ${cleanedCount} expired sessions`);
+    // Refresh jika user-sessions tab aktif
+    if (document.getElementById('user-sessions').classList.contains('active')) {
+      refreshUserData();
+    }
+  }
+}, 5 * 60 * 1000);
+
+// ============ ENHANCED EXTEND SESSION FUNCTION ============
+
+function extendUserSession(userId) {
+  if (confirm(`Perpanjang session user ${userId}?`)) {
+    const keys = Object.keys(localStorage);
+    let extended = false;
+    
+    keys.forEach(key => {
+      if (key.startsWith('ltt_session') && key !== 'ltt_admin_session') {
+        try {
+          const sessionData = JSON.parse(localStorage.getItem(key));
+          if (sessionData && sessionData.accessCode === userId) {
+            // Extend session by 8 hours
+            sessionData.expiresAt = Date.now() + (8 * 60 * 60 * 1000);
+            localStorage.setItem(key, JSON.stringify(sessionData));
+            extended = true;
+          }
+        } catch (e) {
+          console.log('Error extending session:', e);
+        }
+      }
+    });
+    
+    if (extended) {
+      showToast(`Session user ${userId} berhasil diperpanjang`, 'success');
+      setTimeout(() => refreshUserData(), 1000);
+    } else {
+      showToast(`User ${userId} tidak ditemukan`, 'error');
+    }
+  }
+}
 
     function extendUserSession(userId) {
       // Dalam implementasi nyata, extend session di server
