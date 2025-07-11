@@ -705,25 +705,30 @@
     }
 
     // Monitoring sesi
-    function startSessionMonitoring() {
-      // Check session setiap 30 detik
-      sessionCheckInterval = setInterval(() => {
-        if (!LTTAuth.isLoggedIn()) {
-          LTTAuth.logout();
-          return;
-        }
-        
-        const session = LTTAuth.getSession();
-        if (session) {
-          const timeLeft = session.expiresAt - Date.now();
-          
-          // Show warning jika sisa waktu <= 5 menit
-          if (timeLeft <= WARNING_TIME && timeLeft > 0) {
-            showSessionWarning(Math.ceil(timeLeft / 60000)); // Convert ke menit
-          }
-        }
-      }, 30000);
+    // Enhanced session monitoring with admin integration
+function startSessionMonitoring() {
+  // Check session setiap 30 detik
+  sessionCheckInterval = setInterval(() => {
+    if (!LTTAuth.isLoggedIn()) {
+      LTTAuth.logout();
+      return;
     }
+    
+    const session = LTTAuth.getSession();
+    if (session) {
+      const timeLeft = session.expiresAt - Date.now();
+      
+      // Check for admin-forced session settings
+      const sessionSettings = JSON.parse(localStorage.getItem('ltt_session_settings') || '{}');
+      const warningTime = (sessionSettings.warningTime || 5) * 60 * 1000;
+      
+      // Show warning jika sisa waktu <= warning time
+      if (timeLeft <= warningTime && timeLeft > 0) {
+        showSessionWarning(Math.ceil(timeLeft / 60000)); // Convert ke menit
+      }
+    }
+  }, 30000);
+}
 
     // Tampilkan peringatan sesi akan habis
     function showSessionWarning(minutesLeft) {
