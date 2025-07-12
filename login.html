@@ -474,45 +474,193 @@
         const result = await response.json();
         
         if (result.success) {
-          // Save session
-          localStorage.setItem(CONFIG.userSessionKey, JSON.stringify(result.session));
+          // Save admin session
+          localStorage.setItem(CONFIG.adminSessionKey, JSON.stringify(result.session));
           
-          showSuccess('user', 'Login berhasil! Mengalihkan ke halaman utama...');
+          showSuccess('admin', 'Login admin berhasil! Mengalihkan ke panel admin...');
           
-          // Redirect to main page after 2 seconds
+          // Redirect to admin panel after 2 seconds
           setTimeout(() => {
-            window.location.href = 'index.html';
+            window.location.href = 'admin.html';
           }, 2000);
         } else {
-          showError('user', result.error || 'Login gagal');
+          showError('admin', result.error || 'Login admin gagal');
         }
       } catch (error) {
-        console.error('User login error:', error);
-        showError('user', 'Koneksi bermasalah. Silakan coba lagi.');
+        console.error('Admin login error:', error);
+        showError('admin', 'Koneksi bermasalah. Silakan coba lagi.');
       } finally {
         hideLoading();
       }
     });
 
-    // Admin login handler
-    document.getElementById('adminForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      clearErrors();
+    // Check if user is already logged in
+    function checkExistingSession() {
+      const userSession = localStorage.getItem(CONFIG.userSessionKey);
+      const adminSession = localStorage.getItem(CONFIG.adminSessionKey);
       
-      const accessCode = document.getElementById('adminAccessCode').value.trim();
-      const adminName = document.getElementById('adminName').value.trim();
-      
-      if (!accessCode || !adminName) {
-        showError('admin', 'Semua field harus diisi');
-        return;
+      if (userSession) {
+        try {
+          const session = JSON.parse(userSession);
+          if (Date.now() < session.expiresAt) {
+            // User session still valid
+            showSuccess('user', 'Sesi aktif ditemukan. Mengalihkan ke halaman utama...');
+            setTimeout(() => {
+              window.location.href = 'index.html';
+            }, 2000);
+            return;
+          }
+        } catch (e) {
+          localStorage.removeItem(CONFIG.userSessionKey);
+        }
       }
       
-      showLoading();
+      if (adminSession) {
+        try {
+          const session = JSON.parse(adminSession);
+          if (Date.now() < session.expiresAt) {
+            // Admin session still valid
+            showSuccess('admin', 'Sesi admin aktif ditemukan. Mengalihkan ke panel admin...');
+            setTimeout(() => {
+              window.location.href = 'admin.html';
+            }, 2000);
+            return;
+          }
+        } catch (e) {
+          localStorage.removeItem(CONFIG.adminSessionKey);
+        }
+      }
+    }
+
+    // Handle URL parameters for direct login type
+    function handleURLParams() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const loginType = urlParams.get('type');
       
-      try {
-        const formData = new FormData();
-        formData.append('action', 'admin_login');
-        formData.append('access_code', accessCode);
-        formData.append('admin_name', adminName);
+      if (loginType === 'admin') {
+        switchTab('admin');
+        // Simulate click on admin tab
+        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+        document.querySelectorAll('.tab-btn')[1].classList.add('active');
+      }
+    }
+
+    // Initialize page
+    function initializePage() {
+      handleURLParams();
+      checkExistingSession();
+      
+      // Add some interactive features
+      addInputAnimations();
+      checkConnectionStatus();
+    }
+
+    // Add input animations and improvements
+    function addInputAnimations() {
+      const inputs = document.querySelectorAll('input, select');
+      
+      inputs.forEach(input => {
+        input.addEventListener('focus', function() {
+          this.parentElement.style.transform = 'translateY(-2px)';
+          this.parentElement.style.transition = 'transform 0.3s ease';
+        });
         
-        const response = await fetch(CONFIG.scriptURL
+        input.addEventListener('blur', function() {
+          this.parentElement.style.transform = 'translateY(0)';
+        });
+      });
+    }
+
+    // Check connection status
+    function checkConnectionStatus() {
+      if (!navigator.onLine) {
+        showError('user', 'Tidak ada koneksi internet. Beberapa fitur mungkin tidak tersedia.');
+      }
+      
+      window.addEventListener('online', () => {
+        clearErrors();
+        showSuccess('user', 'Koneksi internet tersedia kembali.');
+        setTimeout(clearErrors, 3000);
+      });
+      
+      window.addEventListener('offline', () => {
+        showError('user', 'Koneksi internet terputus. Mode offline aktif.');
+      });
+    }
+
+    // Keyboard shortcuts
+    document.addEventListener('keydown', function(e) {
+      // Ctrl/Cmd + Enter to submit active form
+      if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+        const activeForm = document.querySelector('.login-form.active form');
+        if (activeForm) {
+          activeForm.dispatchEvent(new Event('submit', { cancelable: true }));
+        }
+      }
+      
+      // Tab to switch between user/admin login
+      if (e.key === 'Tab' && e.altKey) {
+        e.preventDefault();
+        const currentTab = document.querySelector('.tab-btn.active');
+        const isUserActive = currentTab.textContent.includes('User');
+        switchTab(isUserActive ? 'admin' : 'user');
+        
+        // Simulate click on the other tab
+        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+        document.querySelectorAll('.tab-btn')[isUserActive ? 1 : 0].classList.add('active');
+      }
+    });
+
+    // Auto-fill demo data (for development/testing)
+    function fillDemoData() {
+      if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+        // Only in development
+        document.getElementById('userAccessCode').value = 'PPL001';
+        document.getElementById('userPenyuluhName').value = 'A.PURNAMA PUTRA';
+        document.getElementById('adminAccessCode').value = 'ADMIN001';
+      }
+    }
+
+    // Security: Clear sensitive data on page unload
+    window.addEventListener('beforeunload', function() {
+      // Clear password fields
+      document.getElementById('adminAccessCode').value = '';
+      document.getElementById('userAccessCode').value = '';
+    });
+
+    // Prevent right-click and F12 in production (optional security measure)
+    if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+      document.addEventListener('contextmenu', e => e.preventDefault());
+      document.addEventListener('keydown', e => {
+        if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && e.key === 'I')) {
+          e.preventDefault();
+        }
+      });
+    }
+
+    // Initialize when DOM is ready
+    document.addEventListener('DOMContentLoaded', function() {
+      initializePage();
+      
+      // Fill demo data in development
+      setTimeout(fillDemoData, 1000);
+      
+      // Add some welcome animation
+      setTimeout(() => {
+        document.querySelector('.login-container').style.opacity = '0';
+        document.querySelector('.login-container').style.transform = 'translateY(20px)';
+        document.querySelector('.login-container').style.transition = 'all 0.5s ease';
+        
+        setTimeout(() => {
+          document.querySelector('.login-container').style.opacity = '1';
+          document.querySelector('.login-container').style.transform = 'translateY(0)';
+        }, 100);
+      }, 100);
+    });
+
+    // Export functions for global access
+    window.switchTab = switchTab;
+    window.fillDemoData = fillDemoData;
+  </script>
+</body>
+</html>
