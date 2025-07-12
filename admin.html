@@ -913,56 +913,56 @@
     }
 
     async function setMonthLock() {
-      const month = document.getElementById('lockedMonth').value;
-      const year = document.getElementById('lockedYear').value;
-      const message = document.getElementById('lockMessage').value;
-      
-      if (!month || !year) {
-        showAlert('Pilih bulan dan tahun terlebih dahulu', 'error');
-        return;
-      }
-      
-      // Update local config immediately
-      currentConfig.monthLock = {
-        enabled: true,
-        month: parseInt(month),
-      year: parseInt(year),
-        message: message || `Input untuk bulan ${getMonthName(month)} ${year} telah dikunci oleh administrator.`
-      };
-      
-      saveConfigLocally(currentConfig);
-      updateLockStatusDisplay();
-      
-      // Broadcast ke semua user tabs
-      broadcastConfigUpdate();
-      
-      try {
-        // Try to sync with server
-        const formData = new FormData();
-        formData.append('action', 'set_config');
-        formData.append('session_id', currentAdminSession.sessionId);
-        formData.append('config_type', 'month_lock');
-        formData.append('enabled', 'true');
-        formData.append('month', month);
-        formData.append('year', year);
-        formData.append('message', message);
-        
-        const response = await fetch(CONFIG.scriptURL, {
-          method: 'POST',
-          body: formData
-        });
-        
-        const result = await response.json();
-        
-        if (result.success) {
-          showAlert(`🔒 Kunci bulan ${getMonthName(month)} ${year} berhasil diaktifkan dan disimpan ke server`, 'success');
-        } else {
-          showAlert(`🔒 Kunci bulan berhasil diaktifkan secara lokal. Error server: ${result.error}`, 'warning');
-        }
-      } catch (error) {
-        showAlert(`🔒 Kunci bulan berhasil diaktifkan secara lokal. Koneksi server bermasalah: ${error.message}`, 'warning');
-      }
+  const month = document.getElementById('lockedMonth').value;
+  const year = document.getElementById('lockedYear').value;
+  const message = document.getElementById('lockMessage').value;
+  
+  if (!month || !year) {
+    showAlert('Pilih bulan dan tahun terlebih dahulu', 'error');
+    return;
+  }
+  
+  // Update local config immediately
+  currentConfig.monthLock = {
+    enabled: true,
+    month: parseInt(month),
+    year: parseInt(year),
+    message: message || `Input untuk bulan ${getMonthName(month)} ${year} telah dikunci oleh administrator.`
+  };
+  
+  saveConfigLocally(currentConfig);
+  updateLockStatusDisplay();
+  
+  // Broadcast ke semua user tabs
+  broadcastConfigUpdate();
+  
+  try {
+    // Try to sync with server
+    const formData = new FormData();
+    formData.append('action', 'set_config');
+    formData.append('session_id', currentAdminSession.sessionId);
+    formData.append('config_type', 'month_lock');
+    formData.append('enabled', 'true');
+    formData.append('month', month);
+    formData.append('year', year);
+    formData.append('message', message);
+    
+    const response = await fetch(CONFIG.scriptURL, {
+      method: 'POST',
+      body: formData
+    });
+    
+    const result = await response.json();
+    
+    if (result.success) {
+      showAlert(`🔒 Kunci bulan ${getMonthName(month)} ${year} berhasil diaktifkan dan disimpan ke server`, 'success');
+    } else {
+      showAlert(`🔒 Kunci bulan berhasil diaktifkan secara lokal. Error server: ${result.error}`, 'warning');
     }
+  } catch (error) {
+    showAlert(`🔒 Kunci bulan berhasil diaktifkan secara lokal. Koneksi server bermasalah: ${error.message}`, 'warning');
+  }
+}
 
     async function toggleMonthLock() {
       const newEnabled = !currentConfig.monthLock.enabled;
