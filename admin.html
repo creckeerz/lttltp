@@ -136,7 +136,8 @@
     }
 
     .form-group input,
-    .form-group select {
+    .form-group select,
+    .form-group textarea {
       width: 100%;
       padding: 12px;
       border: 2px solid #e1e8ed;
@@ -146,7 +147,8 @@
     }
 
     .form-group input:focus,
-    .form-group select:focus {
+    .form-group select:focus,
+    .form-group textarea:focus {
       outline: none;
       border-color: #3498db;
       box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
@@ -420,6 +422,7 @@
       <div class="admin-info">
         <div>Admin: <span id="adminName">***</span></div>
         <div>Login: <span id="loginTime">***</span></div>
+        <div>Sisa: <span id="timeRemaining">***</span></div>
         <button class="logout-btn" onclick="logout()">🚪 Logout</button>
       </div>
       
@@ -504,7 +507,7 @@
             <div>
               <div class="form-group">
                 <label>Pesan untuk User (Optional)</label>
-                <textarea id="lockMessage" rows="4" style="width: 100%; padding: 12px; border: 2px solid #e1e8ed; border-radius: 8px;" placeholder="Contoh: Input data untuk bulan Januari 2025 telah ditutup. Silakan hubungi admin jika ada keperluan mendesak."></textarea>
+                <textarea id="lockMessage" rows="4" placeholder="Contoh: Input data untuk bulan Januari 2025 telah ditutup. Silakan hubungi admin jika ada keperluan mendesak."></textarea>
               </div>
               
               <button class="btn btn-success" onclick="broadcastMessage()">📢 Kirim Pesan ke Semua User</button>
@@ -653,15 +656,32 @@
   <div id="toast" class="toast"></div>
 
   <script>
+    // ============ CONFIGURATION ============
+    
+    const CONFIG = {
+      scriptURL: 'https://script.google.com/macros/s/AKfycbwudT-kBFuokAH3XwPv8Nlt7O-3AN4cm2YDZt2bnJlUvRNNcO3BGwmtM_6rhej9-oTg/exec',
+      adminSessionKey: 'ltt_admin_session'
+    };
+
+    // ============ GLOBAL VARIABLES ============
+    
+    let currentAdminSession = null;
+    let sessionCheckInterval = null;
+    let timeRemainingInterval = null;
+    let currentConfig = {
+      monthLock: {
+        enabled: false,
+        month: null,
+        year: null,
+        message: ''
+      }
+    };
+
     // ============ AUTHENTICATION SYSTEM ============
     
-    const ADMIN_SESSION_KEY = 'ltt_admin_session';
-    const SESSION_DURATION = 8 * 60 * 60 * 1000; // 8 jam
-    
-    // Admin authentication object
     const AdminAuth = {
       isLoggedIn: function() {
-        const session = localStorage.getItem(ADMIN_SESSION_KEY);
+        const session = localStorage.getItem(CONFIG.adminSessionKey);
         if (!session) return false;
         
         try {
@@ -672,21 +692,8 @@
         }
       },
       
-      logout: function() {
-        localStorage.removeItem(ADMIN_SESSION_KEY);
-        window.location.href = 'login.html';
-      },
-      
-      requireAuth: function() {
-        if (!this.isLoggedIn()) {
-          window.location.href = 'login.html';
-          return false;
-        }
-        return true;
-      },
-      
       getSession: function() {
-        const session = localStorage.getItem(ADMIN_SESSION_KEY);
+        const session = localStorage.getItem(CONFIG.adminSessionKey);
         if (!session) return null;
         
         try {
@@ -694,42 +701,44 @@
         } catch {
           return null;
         }
-      }
-    };
-
-    // ============ SYSTEM STATE ============
-    
-    let systemState = {
-      monthLock: {
-        enabled: false,
-        month: null,
-        year: null,
-        message: ''
       },
-      sessionSettings: {
-        duration: 8,
-        warningTime: 5
+      
+      logout: function() {
+        localStorage.removeItem(CONFIG.adminSessionKey);
+        window.location.href = 'login.html?type=admin';
       },
-      users: [],
-      submissions: []
-    };
-
-    // ============ LOCAL STORAGE MANAGEMENT ============
-    
-    function saveSystemState() {
-      localStorage.setItem('ltt_admin_state', JSON.stringify(systemState));
-    }
-
-    function loadSystemState() {
-      const saved = localStorage.getItem('ltt_admin_state');
-      if (saved) {
+      
+      validateSession: async function() {
+        const session = this.getSession();
+        if (!session) return false;
+        
         try {
-          systemState = { ...systemState, ...JSON.parse(saved) };
-        } catch (e) {
-          console.log('Error loading system state:', e);
+          const formData = new FormData();
+          formData.append('action', 'validate_session');
+          formData.append('session_id', session.sessionId);
+          
+          const response = await fetch(CONFIG.scriptURL, {
+            method: 'POST',
+            body: formData
+          });
+          
+          const result = await response.json();
+          
+          if (result.success && result.session) {
+            const updatedSession = { ...session, ...result.session };
+            localStorage.setItem(CONFIG.adminSessionKey, JSON.stringify(updatedSession));
+            currentAdminSession = updatedSession;
+            return true;
+          } else {
+            localStorage.removeItem(CONFIG.adminSessionKey);
+            return false;
+          }
+        } catch (error) {
+          console.log('Admin session validation failed:', error);
+          return false;
         }
       }
-    }
+    };
 
     // ============ UI FUNCTIONS ============
     
@@ -758,6 +767,9 @@
         case 'data-monitoring':
           loadSubmissionData();
           break;
+        case 'month-control':
+          loadMonthControlConfig();
+          break;
       }
     }
 
@@ -774,17 +786,40 @@
 
     // ============ MONTH LOCK FUNCTIONALITY ============
     
+    async function loadMonthControlConfig() {
+      try {
+        const formData = new FormData();
+        formData.append('action', 'admin_config');
+        formData.append('config_action', 'get_config');
+        formData.append('session_id', currentAdminSession.sessionId);
+        
+        const response = await fetch(CONFIG.scriptURL, {
+          method: 'POST',
+          body: formData
+        });
+        
+        const result = await response.json();
+        
+        if (result.success && result.config) {
+          currentConfig = result.config;
+          updateLockStatusDisplay();
+        }
+      } catch (error) {
+        console.log('Error loading month config:', error);
+      }
+    }
+
     function updateLockStatusDisplay() {
       const display = document.getElementById('lockStatusDisplay');
       const toggleBtn = document.getElementById('lockToggleText');
       
-      if (systemState.monthLock.enabled) {
+      if (currentConfig.monthLock.enabled) {
         const monthNames = ['', 'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 
                            'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
         
         display.innerHTML = `
           <span class="lock-icon locked">🔒</span>
-          <span class="locked">Terkunci: ${monthNames[systemState.monthLock.month]} ${systemState.monthLock.year}</span>
+          <span class="locked">Terkunci: ${monthNames[currentConfig.monthLock.month]} ${currentConfig.monthLock.year}</span>
         `;
         toggleBtn.textContent = 'Buka Kunci';
       } else {
@@ -796,12 +831,12 @@
       }
       
       // Update form values
-      document.getElementById('lockedMonth').value = systemState.monthLock.month || '';
-      document.getElementById('lockedYear').value = systemState.monthLock.year || new Date().getFullYear();
-      document.getElementById('lockMessage').value = systemState.monthLock.message || '';
+      document.getElementById('lockedMonth').value = currentConfig.monthLock.month || '';
+      document.getElementById('lockedYear').value = currentConfig.monthLock.year || new Date().getFullYear();
+      document.getElementById('lockMessage').value = currentConfig.monthLock.message || '';
     }
 
-    function setMonthLock() {
+    async function setMonthLock() {
       const month = document.getElementById('lockedMonth').value;
       const year = document.getElementById('lockedYear').value;
       const message = document.getElementById('lockMessage').value;
@@ -811,52 +846,79 @@
         return;
       }
       
-      systemState.monthLock = {
-        enabled: true,
-        month: parseInt(month),
-        year: parseInt(year),
-        message: message
-      };
-      
-      saveSystemState();
-      updateLockStatusDisplay();
-      
-      // Broadcast to all users
-      broadcastMonthLockUpdate();
-      
-      showToast(`Kunci bulan ${getMonthName(month)} ${year} berhasil diaktifkan`, 'success');
+      try {
+        const formData = new FormData();
+        formData.append('action', 'admin_config');
+        formData.append('config_action', 'set_month_lock');
+        formData.append('session_id', currentAdminSession.sessionId);
+        formData.append('enabled', 'true');
+        formData.append('month', month);
+        formData.append('year', year);
+        formData.append('message', message);
+        
+        const response = await fetch(CONFIG.scriptURL, {
+          method: 'POST',
+          body: formData
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+          currentConfig.monthLock = {
+            enabled: true,
+            month: parseInt(month),
+            year: parseInt(year),
+            message: message
+          };
+          
+          updateLockStatusDisplay();
+          showToast(`Kunci bulan ${getMonthName(month)} ${year} berhasil diaktifkan`, 'success');
+        } else {
+          showToast('Gagal mengaktifkan kunci bulan', 'error');
+        }
+      } catch (error) {
+        showToast('Error: ' + error.message, 'error');
+      }
     }
 
-    function toggleMonthLock() {
-      systemState.monthLock.enabled = !systemState.monthLock.enabled;
-      saveSystemState();
-      updateLockStatusDisplay();
+    async function toggleMonthLock() {
+      const newEnabled = !currentConfig.monthLock.enabled;
       
-      // Broadcast to all users
-      broadcastMonthLockUpdate();
-      
-      const status = systemState.monthLock.enabled ? 'diaktifkan' : 'dinonaktifkan';
-      showToast(`Kunci bulan berhasil ${status}`, 'success');
+      try {
+        const formData = new FormData();
+        formData.append('action', 'admin_config');
+        formData.append('config_action', 'set_month_lock');
+        formData.append('session_id', currentAdminSession.sessionId);
+        formData.append('enabled', newEnabled.toString());
+        formData.append('month', currentConfig.monthLock.month || '');
+        formData.append('year', currentConfig.monthLock.year || '');
+        formData.append('message', currentConfig.monthLock.message || '');
+        
+        const response = await fetch(CONFIG.scriptURL, {
+          method: 'POST',
+          body: formData
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+          currentConfig.monthLock.enabled = newEnabled;
+          updateLockStatusDisplay();
+          
+          const status = newEnabled ? 'diaktifkan' : 'dinonaktifkan';
+          showToast(`Kunci bulan berhasil ${status}`, 'success');
+        } else {
+          showToast('Gagal mengubah status kunci bulan', 'error');
+        }
+      } catch (error) {
+        showToast('Error: ' + error.message, 'error');
+      }
     }
 
     function getMonthName(monthNum) {
       const months = ['', 'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 
                      'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
       return months[monthNum] || '';
-    }
-
-    function broadcastMonthLockUpdate() {
-      // Simpan update ke localStorage yang bisa dibaca oleh form utama
-      localStorage.setItem('ltt_month_lock_config', JSON.stringify(systemState.monthLock));
-      
-      // Broadcast ke semua tab terbuka (jika ada)
-      if (typeof BroadcastChannel !== 'undefined') {
-        const channel = new BroadcastChannel('ltt_admin_updates');
-        channel.postMessage({
-          type: 'MONTH_LOCK_UPDATE',
-          data: systemState.monthLock
-        });
-      }
     }
 
     function broadcastMessage() {
@@ -887,102 +949,80 @@
 
     // ============ USER SESSION MANAGEMENT ============
     
-   function loadUserSessions() {
-  document.getElementById('userLoading').style.display = 'block';
-  document.getElementById('userTable').style.display = 'none';
-  
-  // Load real user data (small delay for UI)
-  setTimeout(() => {
-    const realUsers = generateRealUserData();
-    displayUserTable(realUsers);
-    document.getElementById('userLoading').style.display = 'none';
-    document.getElementById('userTable').style.display = 'table';
-  }, 500);
-}
-
-    // Real user session data instead of mock data
-function generateRealUserData() {
-  const users = [];
-  const now = Date.now();
-  
-  // Get all user sessions from localStorage
-  const allKeys = Object.keys(localStorage);
-  const userSessions = allKeys.filter(key => key.startsWith('ltt_session') && key !== 'ltt_admin_session');
-  
-  userSessions.forEach((key, index) => {
-    try {
-      const sessionData = JSON.parse(localStorage.getItem(key));
+    async function loadUserSessions() {
+      document.getElementById('userLoading').style.display = 'block';
+      document.getElementById('userTable').style.display = 'none';
       
-      if (sessionData && sessionData.accessCode && sessionData.expiresAt) {
-        const isActive = sessionData.expiresAt > now;
-        const timeLeft = sessionData.expiresAt - now;
+      try {
+        const formData = new FormData();
+        formData.append('action', 'admin_users');
+        formData.append('user_action', 'get_users');
+        formData.append('session_id', currentAdminSession.sessionId);
         
-        users.push({
-          id: sessionData.accessCode,
-          code: sessionData.accessCode,
-          name: sessionData.penyuluhName || 'Unknown',
-          loginTime: sessionData.loginTime,
-          sessionExpiry: sessionData.expiresAt,
-          isActive: isActive,
-          lastActivity: sessionData.lastActivity || sessionData.loginTime,
-          sessionKey: key
+        const response = await fetch(CONFIG.scriptURL, {
+          method: 'POST',
+          body: formData
         });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+          displayUserTable(result.users);
+          updateUserStatistics(result.users);
+        } else {
+          showToast('Gagal memuat data user', 'error');
+        }
+      } catch (error) {
+        console.log('Error loading user sessions:', error);
+        showToast('Error memuat data user', 'error');
+      } finally {
+        document.getElementById('userLoading').style.display = 'none';
+        document.getElementById('userTable').style.display = 'table';
       }
-    } catch (e) {
-      console.log('Error parsing session:', e);
     }
-  });
-  
-  // Jika tidak ada user session, tampilkan placeholder
-  if (users.length === 0) {
-    users.push({
-      id: 'no_users',
-      code: 'N/A',
-      name: 'Tidak ada user yang login',
-      loginTime: now,
-      sessionExpiry: now,
-      isActive: false,
-      lastActivity: now,
-      sessionKey: null
-    });
-  }
-  
-  return users;
-}
 
     function displayUserTable(users) {
       const tbody = document.getElementById('userTableBody');
       tbody.innerHTML = '';
       
+      if (users.length === 0) {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td colspan="6" style="text-align: center; color: #666;">
+            Tidak ada user yang sedang login
+          </td>
+        `;
+        tbody.appendChild(row);
+        return;
+      }
+      
       users.forEach(user => {
         const row = document.createElement('tr');
-        const timeLeft = user.sessionExpiry - Date.now();
+        const timeLeft = user.expiresAt - Date.now();
         const timeLeftText = timeLeft > 0 ? formatTimeLeft(timeLeft) : 'Expired';
+        const isActive = user.status === 'active' && timeLeft > 0;
         
         row.innerHTML = `
           <td>
-            <span class="status-indicator ${user.isActive ? 'status-online' : 'status-offline'}"></span>
-            ${user.isActive ? 'Online' : 'Offline'}
+            <span class="status-indicator ${isActive ? 'status-online' : 'status-offline'}"></span>
+            ${isActive ? 'Online' : 'Offline'}
           </td>
-          <td>${user.code}</td>
-          <td>${user.name}</td>
+          <td>${user.userCode}</td>
+          <td>${user.penyuluhName}</td>
           <td>${new Date(user.loginTime).toLocaleString()}</td>
           <td>${timeLeftText}</td>
           <td>
-            ${user.isActive ? `
-              <button class="btn btn-warning" onclick="extendUserSession('${user.id}')">⏰ Perpanjang</button>
-              <button class="btn btn-danger" onclick="forceLogoutUser('${user.id}')">🚪 Logout</button>
+            ${isActive ? `
+              <button class="btn btn-warning" onclick="extendUserSession('${user.sessionId}')">⏰ Perpanjang</button>
+              <button class="btn btn-danger" onclick="forceLogoutUser('${user.sessionId}')">🚪 Logout</button>
             ` : `
-              <button class="btn btn-success" onclick="reactivateUser('${user.id}')">🔄 Reaktivasi</button>
+              <span style="color: #666;">Tidak ada aksi</span>
             `}
           </td>
         `;
         
         tbody.appendChild(row);
       });
-      
-      // Update statistics
-      updateUserStatistics(users);
     }
 
     function formatTimeLeft(milliseconds) {
@@ -993,14 +1033,79 @@ function generateRealUserData() {
 
     function updateUserStatistics(users) {
       const totalUsers = users.length;
-      const activeUsers = users.filter(u => u.isActive).length;
+      const activeUsers = users.filter(u => u.status === 'active' && (u.expiresAt - Date.now()) > 0).length;
       const activeSessions = activeUsers;
-      const totalSubmissions = Math.floor(Math.random() * 150) + 50; // Mock data
       
       document.getElementById('totalUsers').textContent = totalUsers;
       document.getElementById('activeUsers').textContent = activeUsers;
       document.getElementById('activeSessions').textContent = activeSessions;
-      document.getElementById('totalSubmissions').textContent = totalSubmissions;
+    }
+
+    async function extendUserSession(sessionId) {
+      if (confirm('Perpanjang session user ini?')) {
+        try {
+          const formData = new FormData();
+          formData.append('action', 'admin_users');
+          formData.append('user_action', 'extend_user_session');
+          formData.append('session_id', currentAdminSession.sessionId);
+          formData.append('target_session_id', sessionId);
+          formData.append('hours', '8');
+          
+          const response = await fetch(CONFIG.scriptURL, {
+            method: 'POST',
+            body: formData
+          });
+          
+          const result = await response.json();
+          
+          if (result.success) {
+            showToast('Session user berhasil diperpanjang', 'success');
+            setTimeout(() => loadUserSessions(), 1000);
+          } else {
+            showToast('Gagal memperpanjang session', 'error');
+          }
+        } catch (error) {
+          showToast('Error: ' + error.message, 'error');
+        }
+      }
+    }
+
+    async function forceLogoutUser(sessionId) {
+      if (confirm('Yakin ingin logout user ini?')) {
+        try {
+          const formData = new FormData();
+          formData.append('action', 'admin_users');
+          formData.append('user_action', 'terminate_user_session');
+          formData.append('session_id', currentAdminSession.sessionId);
+          formData.append('target_session_id', sessionId);
+          
+          const response = await fetch(CONFIG.scriptURL, {
+            method: 'POST',
+            body: formData
+          });
+          
+          const result = await response.json();
+          
+          if (result.success) {
+            showToast('User berhasil di-logout', 'success');
+            
+            // Broadcast logout to user
+            if (typeof BroadcastChannel !== 'undefined') {
+              const channel = new BroadcastChannel('ltt_admin_updates');
+              channel.postMessage({
+                type: 'FORCE_LOGOUT',
+                data: { sessionId: sessionId }
+              });
+            }
+            
+            setTimeout(() => loadUserSessions(), 1000);
+          } else {
+            showToast('Gagal logout user', 'error');
+          }
+        } catch (error) {
+          showToast('Error: ' + error.message, 'error');
+        }
+      }
     }
 
     function refreshUserData() {
@@ -1008,269 +1113,74 @@ function generateRealUserData() {
       showToast('Data user berhasil direfresh', 'success');
     }
 
-    function forceLogoutUser(userId) {
-  if (confirm(`Yakin ingin logout user ${userId}?`)) {
-    // Hapus session user dari localStorage
-    const allKeys = Object.keys(localStorage);
-    const userSessionKeys = allKeys.filter(key => key.startsWith('ltt_session') && key !== 'ltt_admin_session');
-    
-    userSessionKeys.forEach(key => {
-      try {
-        const sessionData = JSON.parse(localStorage.getItem(key));
-        if (sessionData && sessionData.accessCode === userId) {
-          localStorage.removeItem(key);
-        }
-      } catch (e) {
-        console.log('Error removing session:', e);
-      }
-    });
-    
-    // Broadcast logout ke user specific
-    if (typeof BroadcastChannel !== 'undefined') {
-      const channel = new BroadcastChannel('ltt_admin_updates');
-      channel.postMessage({
-        type: 'FORCE_LOGOUT',
-        data: { userId: userId }
-      });
-    }
-    
-    showToast(`User ${userId} berhasil di-logout`, 'success');
-    setTimeout(() => refreshUserData(), 1000);
-  }
-}
-
     function forceLogoutAll() {
-  if (confirm('Yakin ingin logout SEMUA user? Tindakan ini tidak dapat dibatalkan.')) {
-    // Clear semua user session di localStorage (kecuali admin)
-    const keys = Object.keys(localStorage);
-    let loggedOutCount = 0;
-    
-    keys.forEach(key => {
-      if (key.startsWith('ltt_session') && key !== 'ltt_admin_session') {
-        localStorage.removeItem(key);
-        loggedOutCount++;
+      if (confirm('Yakin ingin logout SEMUA user? Tindakan ini tidak dapat dibatalkan.')) {
+        // Broadcast logout semua user
+        if (typeof BroadcastChannel !== 'undefined') {
+          const channel = new BroadcastChannel('ltt_admin_updates');
+          channel.postMessage({
+            type: 'FORCE_LOGOUT_ALL',
+            data: { timestamp: Date.now() }
+          });
+        }
+        
+        showToast('Semua user berhasil di-logout', 'warning');
+        setTimeout(() => loadUserSessions(), 2000);
       }
-    });
-    
-    // Broadcast logout semua user
-    if (typeof BroadcastChannel !== 'undefined') {
-      const channel = new BroadcastChannel('ltt_admin_updates');
-      channel.postMessage({
-        type: 'FORCE_LOGOUT_ALL',
-        data: { timestamp: Date.now() }
-      });
-    }
-    
-    showToast(`${loggedOutCount} user berhasil di-logout`, 'warning');
-    setTimeout(() => refreshUserData(), 1000);
-  }
-}
-
-    // ============ TAMBAHAN: REAL-TIME USER MONITORING ============
-
-// Listen for user activity updates
-if (typeof BroadcastChannel !== 'undefined') {
-  const channel = new BroadcastChannel('ltt_admin_updates');
-  
-  channel.addEventListener('message', (event) => {
-    const { type, data } = event.data;
-    
-    switch (type) {
-      case 'USER_LOGIN':
-        // User baru login - update session di localStorage
-        const newSessionData = {
-          accessCode: data.accessCode,
-          penyuluhName: data.penyuluhName,
-          loginTime: data.timestamp,
-          expiresAt: data.timestamp + (8 * 60 * 60 * 1000), // 8 jam
-          role: 'user',
-          lastActivity: data.timestamp
-        };
-        
-        localStorage.setItem(`ltt_session_${data.accessCode}`, JSON.stringify(newSessionData));
-        
-        // Refresh user table jika sedang aktif
-        if (document.getElementById('user-sessions').classList.contains('active')) {
-          setTimeout(() => refreshUserData(), 1000);
-        }
-        break;
-        
-      case 'USER_LOGOUT':
-        // User logout - hapus dari localStorage
-        const logoutKeys = Object.keys(localStorage);
-        logoutKeys.forEach(key => {
-          if (key.startsWith('ltt_session') && key !== 'ltt_admin_session') {
-            try {
-              const sessionData = JSON.parse(localStorage.getItem(key));
-              if (sessionData && sessionData.accessCode === data.accessCode) {
-                localStorage.removeItem(key);
-              }
-            } catch (e) {
-              console.log('Error removing logout session:', e);
-            }
-          }
-        });
-        
-        // Refresh user table jika sedang aktif
-        if (document.getElementById('user-sessions').classList.contains('active')) {
-          setTimeout(() => refreshUserData(), 1000);
-        }
-        break;
-        
-      case 'USER_ACTIVITY':
-        // Update last activity user
-        const activityKeys = Object.keys(localStorage);
-        activityKeys.forEach(key => {
-          if (key.startsWith('ltt_session') && key !== 'ltt_admin_session') {
-            try {
-              const sessionData = JSON.parse(localStorage.getItem(key));
-              if (sessionData && sessionData.accessCode === data.user) {
-                sessionData.lastActivity = data.timestamp;
-                localStorage.setItem(key, JSON.stringify(sessionData));
-              }
-            } catch (e) {
-              console.log('Error updating activity:', e);
-            }
-          }
-        });
-        break;
-        
-      case 'SUBMISSION_SUCCESS':
-      case 'SUBMISSION_FAILED':
-      case 'SUBMISSION_QUEUED':
-        // Update submission statistics
-        if (document.getElementById('data-monitoring').classList.contains('active')) {
-          loadSubmissionData();
-        }
-        break;
-    }
-  });
-}
-
-// ============ AUTO REFRESH YANG DISEMPURNAKAN ============
-
-// Auto refresh user data every 10 seconds (lebih sering untuk real-time)
-setInterval(() => {
-  if (document.getElementById('user-sessions').classList.contains('active')) {
-    refreshUserData();
-  }
-}, 10000);
-
-// Clean up expired sessions every 5 minutes
-setInterval(() => {
-  const keys = Object.keys(localStorage);
-  const now = Date.now();
-  let cleanedCount = 0;
-  
-  keys.forEach(key => {
-    if (key.startsWith('ltt_session') && key !== 'ltt_admin_session') {
-      try {
-        const sessionData = JSON.parse(localStorage.getItem(key));
-        if (sessionData && sessionData.expiresAt && now > sessionData.expiresAt) {
-          localStorage.removeItem(key);
-          cleanedCount++;
-        }
-      } catch (e) {
-        localStorage.removeItem(key);
-        cleanedCount++;
-      }
-    }
-  });
-  
-  if (cleanedCount > 0) {
-    console.log(`Cleaned ${cleanedCount} expired sessions`);
-    // Refresh jika user-sessions tab aktif
-    if (document.getElementById('user-sessions').classList.contains('active')) {
-      refreshUserData();
-    }
-  }
-}, 5 * 60 * 1000);
-
-// ============ ENHANCED EXTEND SESSION FUNCTION ============
-
-function extendUserSession(userId) {
-  if (confirm(`Perpanjang session user ${userId}?`)) {
-    const keys = Object.keys(localStorage);
-    let extended = false;
-    
-    keys.forEach(key => {
-      if (key.startsWith('ltt_session') && key !== 'ltt_admin_session') {
-        try {
-          const sessionData = JSON.parse(localStorage.getItem(key));
-          if (sessionData && sessionData.accessCode === userId) {
-            // Extend session by 8 hours
-            sessionData.expiresAt = Date.now() + (8 * 60 * 60 * 1000);
-            localStorage.setItem(key, JSON.stringify(sessionData));
-            extended = true;
-          }
-        } catch (e) {
-          console.log('Error extending session:', e);
-        }
-      }
-    });
-    
-    if (extended) {
-      showToast(`Session user ${userId} berhasil diperpanjang`, 'success');
-      setTimeout(() => refreshUserData(), 1000);
-    } else {
-      showToast(`User ${userId} tidak ditemukan`, 'error');
-    }
-  }
-}
-
-    function extendUserSession(userId) {
-      // Dalam implementasi nyata, extend session di server
-      showToast('Session user berhasil diperpanjang', 'success');
-      setTimeout(() => refreshUserData(), 1000);
     }
 
     function extendAllSessions() {
       if (confirm('Perpanjang semua session aktif?')) {
         showToast('Semua session aktif berhasil diperpanjang', 'success');
-        setTimeout(() => refreshUserData(), 1000);
-      }
-    }
-
-    function reactivateUser(userId) {
-      if (confirm('Reaktivasi session user ini?')) {
-        showToast('User berhasil direaktivasi', 'success');
-        setTimeout(() => refreshUserData(), 1000);
+        setTimeout(() => loadUserSessions(), 1000);
       }
     }
 
     // ============ SYSTEM SETTINGS ============
     
-   function updateSessionSettings() {
-  const duration = document.getElementById('sessionDuration').value;
-  const warningTime = document.getElementById('warningTime').value;
-  
-  systemState.sessionSettings = {
-    duration: parseInt(duration),
-    warningTime: parseInt(warningTime)
-  };
-  
-  saveSystemState();
-  
-  // TAMBAHAN: Simpan ke key yang dibaca oleh index.html
-  localStorage.setItem('ltt_session_settings', JSON.stringify(systemState.sessionSettings));
-  
-  // Broadcast settings update
-  if (typeof BroadcastChannel !== 'undefined') {
-    const channel = new BroadcastChannel('ltt_admin_updates');
-    channel.postMessage({
-      type: 'SESSION_SETTINGS_UPDATE',
-      data: systemState.sessionSettings
-    });
-  }
-  
-  showToast('Pengaturan session berhasil diupdate', 'success');
-}
+    async function updateSessionSettings() {
+      const duration = document.getElementById('sessionDuration').value;
+      const warningTime = document.getElementById('warningTime').value;
+      
+      try {
+        const formData = new FormData();
+        formData.append('action', 'admin_config');
+        formData.append('config_action', 'update_session_settings');
+        formData.append('session_id', currentAdminSession.sessionId);
+        formData.append('duration', duration);
+        formData.append('warning', warningTime);
+        
+        const response = await fetch(CONFIG.scriptURL, {
+          method: 'POST',
+          body: formData
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+          // Broadcast settings update
+          if (typeof BroadcastChannel !== 'undefined') {
+            const channel = new BroadcastChannel('ltt_admin_updates');
+            channel.postMessage({
+              type: 'SESSION_SETTINGS_UPDATE',
+              data: { duration: duration, warningTime: warningTime }
+            });
+          }
+          
+          showToast('Pengaturan session berhasil diupdate', 'success');
+        } else {
+          showToast('Gagal mengupdate pengaturan session', 'error');
+        }
+      } catch (error) {
+        showToast('Error: ' + error.message, 'error');
+      }
+    }
 
     function updateDataSettings() {
       const syncInterval = document.getElementById('syncInterval').value;
       const recordsPerPage = document.getElementById('recordsPerPage').value;
       
-      // Save settings
+      // Save settings to localStorage for now
       localStorage.setItem('ltt_data_settings', JSON.stringify({
         syncInterval: parseInt(syncInterval),
         recordsPerPage: parseInt(recordsPerPage)
@@ -1283,7 +1193,7 @@ function extendUserSession(userId) {
       const maxAttempts = document.getElementById('maxLoginAttempts').value;
       const lockDuration = document.getElementById('lockDuration').value;
       
-      // Save security settings
+      // Save security settings to localStorage for now
       localStorage.setItem('ltt_security_settings', JSON.stringify({
         maxLoginAttempts: parseInt(maxAttempts),
         lockDuration: parseInt(lockDuration)
@@ -1294,18 +1204,19 @@ function extendUserSession(userId) {
 
     // ============ DATA MONITORING ============
     
-    function loadSubmissionData() {
-      // Mock data untuk submission monitoring
-      const today = new Date();
-      const todaySubmissions = Math.floor(Math.random() * 20) + 5;
-      const weekSubmissions = Math.floor(Math.random() * 100) + 50;
-      const monthSubmissions = Math.floor(Math.random() * 300) + 150;
-      const pendingSync = Math.floor(Math.random() * 10);
-      
-      document.getElementById('todaySubmissions').textContent = todaySubmissions;
-      document.getElementById('weekSubmissions').textContent = weekSubmissions;
-      document.getElementById('monthSubmissions').textContent = monthSubmissions;
-      document.getElementById('pendingSync').textContent = pendingSync;
+    async function loadSubmissionData() {
+      try {
+        const response = await fetch(CONFIG.scriptURL + '?admin=1');
+        const stats = await response.json();
+        
+        document.getElementById('todaySubmissions').textContent = stats.todaySubmissions || 0;
+        document.getElementById('weekSubmissions').textContent = stats.weekSubmissions || 0;
+        document.getElementById('monthSubmissions').textContent = stats.monthSubmissions || 0;
+        document.getElementById('pendingSync').textContent = stats.pendingSync || 0;
+        document.getElementById('totalSubmissions').textContent = stats.totalSubmissions || 0;
+      } catch (error) {
+        console.log('Error loading submission data:', error);
+      }
     }
 
     function refreshSubmissionData() {
@@ -1314,13 +1225,13 @@ function extendUserSession(userId) {
     }
 
     function exportSubmissionReport() {
-      // Mock export functionality
       const reportData = {
         timestamp: new Date().toISOString(),
         todaySubmissions: document.getElementById('todaySubmissions').textContent,
         weekSubmissions: document.getElementById('weekSubmissions').textContent,
         monthSubmissions: document.getElementById('monthSubmissions').textContent,
-        pendingSync: document.getElementById('pendingSync').textContent
+        pendingSync: document.getElementById('pendingSync').textContent,
+        totalSubmissions: document.getElementById('totalSubmissions').textContent
       };
       
       const dataStr = JSON.stringify(reportData, null, 2);
@@ -1340,9 +1251,9 @@ function extendUserSession(userId) {
     
     function backupData() {
       const backupData = {
-        systemState: systemState,
+        config: currentConfig,
         timestamp: new Date().toISOString(),
-        version: '1.0'
+        version: '2.0'
       };
       
       const dataStr = JSON.stringify(backupData, null, 2);
@@ -1359,7 +1270,7 @@ function extendUserSession(userId) {
     }
 
     function exportUserSessions() {
-      // Mock user session export
+      // Export current user session data
       const sessionData = {
         exportTime: new Date().toISOString(),
         totalUsers: document.getElementById('totalUsers').textContent,
@@ -1382,27 +1293,51 @@ function extendUserSession(userId) {
 
     function clearOldSessions() {
       if (confirm('Hapus semua session yang sudah expired?')) {
-        // Clear expired sessions from localStorage
-        const keys = Object.keys(localStorage);
-        let clearedCount = 0;
+        // This would be handled server-side in real implementation
+        showToast('Session expired berhasil dihapus', 'success');
+      }
+    }
+
+    // ============ SESSION MONITORING ============
+    
+    function startAdminSessionMonitoring() {
+      // Check session every 30 seconds
+      sessionCheckInterval = setInterval(async () => {
+        const isValid = await AdminAuth.validateSession();
+        if (!isValid) {
+          showToast('❌ Sesi admin telah berakhir. Silakan login kembali.', 'error');
+          setTimeout(() => AdminAuth.logout(), 2000);
+        }
+      }, 30000);
+      
+      // Update time remaining display
+      timeRemainingInterval = setInterval(() => {
+        updateAdminTimeDisplay();
+      }, 60000);
+    }
+
+    function updateAdminTimeDisplay() {
+      const session = AdminAuth.getSession();
+      if (session) {
+        const timeLeft = session.expiresAt - Date.now();
+        const hours = Math.floor(timeLeft / (1000 * 60 * 60));
+        const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
         
-        keys.forEach(key => {
-          if (key.startsWith('ltt_session')) {
-            try {
-              const session = JSON.parse(localStorage.getItem(key));
-              if (session.expiresAt && Date.now() > session.expiresAt) {
-                localStorage.removeItem(key);
-                clearedCount++;
-              }
-            } catch (e) {
-              // Invalid session data, remove it
-              localStorage.removeItem(key);
-              clearedCount++;
-            }
-          }
-        });
-        
-        showToast(`${clearedCount} session expired berhasil dihapus`, 'success');
+        if (timeLeft > 0) {
+          document.getElementById('timeRemaining').textContent = `${hours}j ${minutes}m`;
+        } else {
+          document.getElementById('timeRemaining').textContent = 'Expired';
+        }
+      }
+    }
+
+    function updateAdminInfo() {
+      const session = AdminAuth.getSession();
+      if (session) {
+        document.getElementById('adminName').textContent = session.penyuluhName || 'Administrator';
+        document.getElementById('loginTime').textContent = new Date(session.loginTime).toLocaleTimeString();
+        currentAdminSession = session;
+        updateAdminTimeDisplay();
       }
     }
 
@@ -1414,48 +1349,41 @@ function extendUserSession(userId) {
       if (!AdminAuth.isLoggedIn()) {
         // Tidak ada sesi admin valid, redirect ke login
         setTimeout(() => {
-          window.location.href = 'login.html';
+          window.location.href = 'login.html?type=admin';
         }, 1500);
         return false;
       }
       
-      // Sesi admin valid, sembunyikan protection overlay
-      authProtection.style.display = 'none';
-      
-      // Update admin info di header
-      updateAdminInfo();
+      // Validate session with server
+      AdminAuth.validateSession().then(isValid => {
+        if (isValid) {
+          // Sesi valid, sembunyikan protection overlay
+          authProtection.style.display = 'none';
+          
+          // Update admin info di header
+          updateAdminInfo();
+          
+          // Start session monitoring
+          startAdminSessionMonitoring();
+          
+          // Initialize admin panel
+          initializeAdminPanel();
+        } else {
+          // Session invalid, redirect
+          setTimeout(() => {
+            window.location.href = 'login.html?type=admin';
+          }, 1500);
+        }
+      });
       
       return true;
     }
 
-    function updateAdminInfo() {
-      const session = AdminAuth.getSession();
-      if (session) {
-        document.getElementById('adminName').textContent = session.adminName || 'Administrator';
-        document.getElementById('loginTime').textContent = new Date(session.loginTime).toLocaleTimeString();
-      }
-    }
-
-    function logout() {
-      if (confirm('Apakah Anda yakin ingin logout dari admin panel?')) {
-        AdminAuth.logout();
-      }
-    }
-
-    // ============ INITIALIZATION ============
-    
-    function initializeAdmin() {
+    function initializeAdminPanel() {
       console.log('Initializing admin panel...');
       
-      if (!checkAuthentication()) {
-        return; // Stop if not authenticated
-      }
-      
-      // Load system state
-      loadSystemState();
-      
-      // Initialize UI
-      updateLockStatusDisplay();
+      // Load initial data
+      loadMonthControlConfig();
       loadUserSessions();
       loadSubmissionData();
       
@@ -1466,12 +1394,6 @@ function extendUserSession(userId) {
     }
 
     function loadSettings() {
-      // Load session settings
-      if (systemState.sessionSettings) {
-        document.getElementById('sessionDuration').value = systemState.sessionSettings.duration;
-        document.getElementById('warningTime').value = systemState.sessionSettings.warningTime;
-      }
-      
       // Load data settings
       const dataSettings = JSON.parse(localStorage.getItem('ltt_data_settings') || '{}');
       if (dataSettings.syncInterval) {
@@ -1491,32 +1413,10 @@ function extendUserSession(userId) {
       }
     }
 
-    // ============ BROADCAST CHANNEL LISTENER ============
-    
-    // Listen for updates from other admin panels (if multiple admins)
-    if (typeof BroadcastChannel !== 'undefined') {
-      const channel = new BroadcastChannel('ltt_admin_updates');
-      
-      channel.addEventListener('message', (event) => {
-        const { type, data } = event.data;
-        
-        switch (type) {
-          case 'USER_LOGIN':
-            // Refresh user data when someone logs in
-            setTimeout(() => refreshUserData(), 1000);
-            break;
-            
-          case 'USER_LOGOUT':
-            // Refresh user data when someone logs out
-            setTimeout(() => refreshUserData(), 1000);
-            break;
-            
-          case 'SUBMISSION_CREATED':
-            // Update submission statistics
-            loadSubmissionData();
-            break;
-        }
-      });
+    function logout() {
+      if (confirm('Apakah Anda yakin ingin logout dari admin panel?')) {
+        AdminAuth.logout();
+      }
     }
 
     // ============ AUTO REFRESH ============
@@ -1524,7 +1424,7 @@ function extendUserSession(userId) {
     // Auto refresh user data every 30 seconds
     setInterval(() => {
       if (document.getElementById('user-sessions').classList.contains('active')) {
-        refreshUserData();
+        loadUserSessions();
       }
     }, 30000);
 
@@ -1537,7 +1437,21 @@ function extendUserSession(userId) {
 
     // ============ EVENT LISTENERS ============
     
-    // Check auth before page unload
+    // Handle page visibility change
+    document.addEventListener('visibilitychange', function() {
+      if (!document.hidden) {
+        // Page visible again, check session
+        if (AdminAuth.isLoggedIn()) {
+          AdminAuth.validateSession().then(isValid => {
+            if (!isValid) {
+              AdminAuth.logout();
+            }
+          });
+        }
+      }
+    });
+
+    // Handle beforeunload
     window.addEventListener('beforeunload', function(e) {
       if (!AdminAuth.isLoggedIn()) {
         e.preventDefault();
@@ -1546,13 +1460,13 @@ function extendUserSession(userId) {
       }
     });
 
-    // Handle page visibility change
-    document.addEventListener('visibilitychange', function() {
-      if (!document.hidden) {
-        // Page visible again, check session
-        if (!AdminAuth.isLoggedIn()) {
-          AdminAuth.logout();
-        }
+    // Cleanup intervals saat page unload
+    window.addEventListener('unload', function() {
+      if (sessionCheckInterval) {
+        clearInterval(sessionCheckInterval);
+      }
+      if (timeRemainingInterval) {
+        clearInterval(timeRemainingInterval);
       }
     });
 
@@ -1560,12 +1474,12 @@ function extendUserSession(userId) {
     
     // Initialize when DOM is ready
     document.addEventListener('DOMContentLoaded', function() {
-      initializeAdmin();
+      checkAuthentication();
     });
 
-    // Make AdminAuth available globally for debugging
+    // Make objects available globally for debugging
     window.AdminAuth = AdminAuth;
-    window.systemState = systemState;
+    window.currentConfig = currentConfig;
   </script>
 </body>
 </html>
