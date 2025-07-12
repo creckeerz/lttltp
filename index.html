@@ -685,82 +685,129 @@
           <li><a class="nav-link" href="#step-4">Step 4<br/><small>Jagung & Submit</small></a></li>
         </ul>
 
-        <div class="tab-content">
-          <!-- STEP 1 -->
-          <div id="step-1" class="tab-pane" role="tabpanel">
-            <label>Timestamp</label>
-            <input type="datetime-local" name="Timestamp" required />
-            <label>Periode Monitoring</label>
-            <select name="Periode Monitoring" required>
-              <option value="">Pilih</option>
-              <option value="Minggu ke 1">Minggu ke 1</option>
-              <option value="Minggu ke 2">Minggu ke 2</option>
-              <option value="Minggu ke 3">Minggu ke 3</option>
-              <option value="Minggu ke 4">Minggu ke 4</option>
-              <option value="Minggu ke 5">Minggu ke 5</option>
-            </select>
+       <div class="tab-content">
+  <!-- STEP 1 -->
+  <div id="step-1" class="tab-pane" role="tabpanel">
+    <label>Timestamp <span style="color: red;">*</span></label>
+    <input type="datetime-local" name="Timestamp" required />
+    
+    <label>Periode Monitoring <span style="color: red;">*</span></label>
+    <select name="Periode Monitoring" required>
+      <option value="">Pilih</option>
+      <option value="Minggu ke 1">Minggu ke 1</option>
+      <option value="Minggu ke 2">Minggu ke 2</option>
+      <option value="Minggu ke 3">Minggu ke 3</option>
+      <option value="Minggu ke 4">Minggu ke 4</option>
+      <option value="Minggu ke 5">Minggu ke 5</option>
+    </select>
 
-            <label>Nama Penyuluh:</label>
-            <input type="text" name="nama" id="formPenyuluhName" readonly style="background: #f8f9fa;" />
+    <label>Nama Penyuluh <span style="color: red;">*</span></label>
+    <input type="text" name="nama" id="formPenyuluhName" readonly style="background: #f8f9fa;" required />
 
-            <label>Kecamatan</label>
-            <select name="Kecamatan" id="kecamatanSelect" required></select>
-            <label>Desa</label>
-            <select name="Desa" id="desaSelect" required></select>
-          </div>
-
-          <!-- STEP 2 - DATA LTT -->
-          <div id="step-2" class="tab-pane" role="tabpanel">
-            <label>Luas Baku Sawah (LBS)</label>
-            <input type="number" name="Luas Baku Sawah (LBS)" step="0.01" required />
-            <label>Luas Tanam Tahun Sebelumnya (Ha)</label>
-            <input type="number" name="Luas Tanam Tahun Sebelumnya (Ha)" step="0.01" required />
-            <label>IP Existing</label>
-            <input type="text" name="IP Existing" required />
-            <label>LTT Padi Reguler (Ha)</label>
-            <input type="number" name="LTT Padi Reguler (Ha)" step="0.01" required />
-            <label>LTT Padi Oplah (Ha)</label>
-            <input type="number" name="LTT Padi Oplah (Ha)" step="0.01" required />
-            <label>LTT Padi Irigasi Pompa (Ha)</label>
-            <input type="number" name="LTT Padi Irigasi Pompa (Ha)" step="0.01" required />
-            <label>LTT Padi Gogo / Lahan Kering</label>
-            <input type="number" name="LTT Padi Gogo / Lahan Kering" step="0.01" required />
-          </div>
-
-          <!-- STEP 3 - DATA LTP -->
-          <div id="step-3" class="tab-pane" role="tabpanel">
-            <label>LTP Padi Reguler (Ha)</label>
-            <input type="number" name="LTP Padi Reguler (Ha)" step="0.01" required />
-            <label>Provitas Padi Reguler (Ku/Ha)</label>
-            <input type="number" name="Provitas Padi Reguler (Ku/Ha)" step="0.01" required />
-            <label>LTP Padi Oplah (Ha)</label>
-            <input type="number" name="LTP Padi Oplah (Ha)" step="0.01" required />
-            <label>Provitas Padi Oplah (Ku/Ha)</label>
-            <input type="number" name="Provitas Padi Oplah (Ku/Ha)" step="0.01" required />
-            <label>LTP Padi Irigasi Pompa (Ha)</label>
-            <input type="number" name="LTP Padi Irigasi Pompa (Ha)" step="0.01" required />
-            <label>Provitas Padi irigasi Pompa (Ku/Ha)</label>
-            <input type="number" name="Provitas Padi irigasi Pompa (Ku/Ha)" step="0.01" required />
-            <label>LTP Padi Gogo / Lahan Kering</label>
-            <input type="number" name="LTP Padi Gogo / Lahan Kering" step="0.01" required />
-            <label>Provitas Padi Gogo (Ku/Ha)</label>
-            <input type="number" name="Provitas Padi Gogo (Ku/Ha)" step="0.01" required />
-          </div>
-
-          <!-- STEP 4 - JAGUNG & SUBMIT -->
-          <div id="step-4" class="tab-pane" role="tabpanel">
-            <label>LTT Jagung (Ha)</label>
-            <input type="number" name="LTT Jagung (Ha)" step="0.01" required />
-            <label>LTP Jagung (Ha)</label>
-            <input type="number" name="LTP Jagung (Ha)" step="0.01" required />
-            <label>Provitas Jagung (Ku/Ha)</label>
-            <input type="number" name="Provitas Jagung (Ku/Ha)" step="0.01" required />
-            <button type="submit">✅ Kirim Data</button>
-          </div>
-        </div>
-      </div>
-    </form>
+    <label>Kecamatan <span style="color: red;">*</span></label>
+    <select name="Kecamatan" id="kecamatanSelect" required>
+      <option value="">-- Pilih Kecamatan --</option>
+    </select>
+    
+    <label>Desa <span style="color: red;">*</span></label>
+    <select name="Desa" id="desaSelect" required>
+      <option value="">-- Pilih Desa --</option>
+    </select>
   </div>
+
+  <!-- STEP 2 - DATA LTT -->
+  <div id="step-2" class="tab-pane" role="tabpanel">
+    <label>Luas Baku Sawah (LBS) <span style="color: red;">*</span></label>
+    <input type="number" name="Luas Baku Sawah (LBS)" step="0.01" min="0" required />
+    
+    <label>Luas Tanam Tahun Sebelumnya (Ha) <span style="color: red;">*</span></label>
+    <input type="number" name="Luas Tanam Tahun Sebelumnya (Ha)" step="0.01" min="0" required />
+    
+    <label>IP Existing <span style="color: red;">*</span></label>
+    <input type="text" name="IP Existing" placeholder="Contoh: IP 200" required />
+    
+    <label>LTT Padi Reguler (Ha) <span style="color: red;">*</span></label>
+    <input type="number" name="LTT Padi Reguler (Ha)" step="0.01" min="0" required />
+    
+    <label>LTT Padi Oplah (Ha) <span style="color: red;">*</span></label>
+    <input type="number" name="LTT Padi Oplah (Ha)" step="0.01" min="0" required />
+    
+    <label>LTT Padi Irigasi Pompa (Ha) <span style="color: red;">*</span></label>
+    <input type="number" name="LTT Padi Irigasi Pompa (Ha)" step="0.01" min="0" required />
+    
+    <label>LTT Padi Gogo / Lahan Kering (Ha) <span style="color: red;">*</span></label>
+    <input type="number" name="LTT Padi Gogo / Lahan Kering" step="0.01" min="0" required />
+  </div>
+
+  <!-- STEP 3 - DATA LTP -->
+  <div id="step-3" class="tab-pane" role="tabpanel">
+    <label>LTP Padi Reguler (Ha) <span style="color: red;">*</span></label>
+    <input type="number" name="LTP Padi Reguler (Ha)" step="0.01" min="0" required />
+    
+    <label>Produktivitas Padi Reguler (Ku/Ha) <span style="color: red;">*</span></label>
+    <input type="number" name="Provitas Padi Reguler (Ku/Ha)" step="0.01" min="0" required />
+    
+    <label>LTP Padi Oplah (Ha) <span style="color: red;">*</span></label>
+    <input type="number" name="LTP Padi Oplah (Ha)" step="0.01" min="0" required />
+    
+    <label>Produktivitas Padi Oplah (Ku/Ha) <span style="color: red;">*</span></label>
+    <input type="number" name="Provitas Padi Oplah (Ku/Ha)" step="0.01" min="0" required />
+    
+    <label>LTP Padi Irigasi Pompa (Ha) <span style="color: red;">*</span></label>
+    <input type="number" name="LTP Padi Irigasi Pompa (Ha)" step="0.01" min="0" required />
+    
+    <label>Produktivitas Padi Irigasi Pompa (Ku/Ha) <span style="color: red;">*</span></label>
+    <input type="number" name="Provitas Padi irigasi Pompa (Ku/Ha)" step="0.01" min="0" required />
+    
+    <label>LTP Padi Gogo / Lahan Kering (Ha) <span style="color: red;">*</span></label>
+    <input type="number" name="LTP Padi Gogo / Lahan Kering" step="0.01" min="0" required />
+    
+    <label>Produktivitas Padi Gogo (Ku/Ha) <span style="color: red;">*</span></label>
+    <input type="number" name="Provitas Padi Gogo (Ku/Ha)" step="0.01" min="0" required />
+  </div>
+
+  <!-- STEP 4 - JAGUNG & SUBMIT -->
+  <div id="step-4" class="tab-pane" role="tabpanel">
+    <label>LTT Jagung (Ha) <span style="color: red;">*</span></label>
+    <input type="number" name="LTT Jagung (Ha)" step="0.01" min="0" required />
+    
+    <label>LTP Jagung (Ha) <span style="color: red;">*</span></label>
+    <input type="number" name="LTP Jagung (Ha)" step="0.01" min="0" required />
+    
+    <label>Produktivitas Jagung (Ku/Ha) <span style="color: red;">*</span></label>
+    <input type="number" name="Provitas Jagung (Ku/Ha)" step="0.01" min="0" required />
+    
+    <div style="margin-top: 30px; padding: 20px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #2ecc71;">
+      <h4 style="color: #2c3e50; margin-bottom: 10px;">📋 Ringkasan Pengisian</h4>
+      <p style="color: #7f8c8d; font-size: 14px; margin-bottom: 15px;">
+        Pastikan semua data yang diisi sudah benar sebelum mengirim.
+      </p>
+      <div style="display: flex; gap: 10px; align-items: center;">
+        <input type="checkbox" id="confirmData" required style="transform: scale(1.2);">
+        <label for="confirmData" style="color: #34495e; font-weight: 600;">
+          Saya telah memeriksa dan memastikan semua data sudah benar <span style="color: red;">*</span>
+        </label>
+      </div>
+    </div>
+    
+    <button type="submit" style="
+      width: 100%;
+      margin-top: 20px;
+      padding: 15px 20px;
+      background: linear-gradient(135deg, #2ecc71, #27ae60);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 18px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    " onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 25px rgba(46, 204, 113, 0.3)'" 
+       onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none'">
+      ✅ Kirim Data Monitoring
+    </button>
+  </div>
+</div>
 
   <!-- Table & Control -->
   <div class="controls">
