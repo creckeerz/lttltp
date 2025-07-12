@@ -327,11 +327,286 @@
       cursor: pointer;
       font-weight: 600;
     }
+
+    /* Month lock warning */
+    .month-lock-warning {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: #e74c3c;
+      color: white;
+      padding: 25px 35px;
+      border-radius: 12px;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.3);
+      z-index: 10002;
+      text-align: center;
+      display: none;
+      max-width: 500px;
+    }
+
+    .month-lock-warning h3 {
+      margin-bottom: 15px;
+      font-size: 20px;
+    }
+
+    .month-lock-warning button {
+      background: white;
+      color: #e74c3c;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 6px;
+      margin-top: 15px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    /* Login form styles */
+    .login-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      z-index: 20000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .login-form {
+      background: white;
+      padding: 40px;
+      border-radius: 20px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+      max-width: 400px;
+      width: 90%;
+      text-align: center;
+    }
+
+    .login-form h2 {
+      color: #2c3e50;
+      margin-bottom: 30px;
+      font-size: 28px;
+    }
+
+    .login-form .form-group {
+      margin-bottom: 20px;
+      text-align: left;
+    }
+
+    .login-form label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: #34495e;
+    }
+
+    .login-form input,
+    .login-form select {
+      width: 100%;
+      padding: 12px;
+      border: 2px solid #e1e8ed;
+      border-radius: 8px;
+      font-size: 14px;
+      transition: border-color 0.3s ease;
+    }
+
+    .login-form input:focus,
+    .login-form select:focus {
+      outline: none;
+      border-color: #3498db;
+      box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+    }
+
+    .login-btn {
+      width: 100%;
+      padding: 15px;
+      background: linear-gradient(135deg, #3498db, #2980b9);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.3s ease;
+    }
+
+    .login-btn:hover {
+      transform: translateY(-2px);
+    }
+
+    .login-error {
+      background: #e74c3c;
+      color: white;
+      padding: 10px;
+      border-radius: 6px;
+      margin-bottom: 20px;
+      display: none;
+    }
+
+    .admin-link {
+      margin-top: 20px;
+      color: #7f8c8d;
+      font-size: 12px;
+    }
+
+    .admin-link a {
+      color: #3498db;
+      text-decoration: none;
+    }
+
+    /* Admin broadcast message */
+    .admin-message {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: #9b59b6;
+      color: white;
+      padding: 15px 20px;
+      border-radius: 10px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+      z-index: 10003;
+      max-width: 350px;
+      display: none;
+    }
+
+    .admin-message h4 {
+      margin-bottom: 10px;
+      font-size: 16px;
+    }
+
+    .admin-message .close-btn {
+      position: absolute;
+      top: 5px;
+      right: 10px;
+      background: none;
+      border: none;
+      color: white;
+      font-size: 18px;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
+  <!-- Login Container -->
+  <div id="loginContainer" class="login-container">
+    <div class="login-form">
+      <h2>🔐 Login Sistem</h2>
+      <div id="loginError" class="login-error"></div>
+      
+      <form id="loginForm">
+        <div class="form-group">
+          <label>Kode Akses</label>
+          <input type="text" id="accessCode" placeholder="Masukkan kode akses" required />
+        </div>
+        
+        <div class="form-group">
+          <label>Nama Penyuluh</label>
+          <select id="penyuluhName" required>
+            <option value="">-- Pilih Nama Penyuluh --</option>
+            <option>A.PURNAMA PUTRA</option>
+            <option>AAN PUJINURINSAN</option>
+            <option>ABDUL RAHMAN</option>
+            <option>AGUS SAIFUDDIN</option>
+            <option>AGUSMANTO</option>
+            <option>AHADI</option>
+            <option>ALMIZAN</option>
+            <option>ALWAN SASRUDIN</option>
+            <option>ANDI</option>
+            <option>ANDI WIHARDI</option>
+            <option>ANDI WILLIAM</option>
+            <option>ANTO SAPUTRA</option>
+            <option>ARAMIYA</option>
+            <option>BUDI SETIAWAN</option>
+            <option>DARMA IRAWAN</option>
+            <option>DARMADI</option>
+            <option>DARUSSALAM</option>
+            <option>DINO</option>
+            <option>DIYANTO</option>
+            <option>EDI WAHYUDI</option>
+            <option>EDWARDI</option>
+            <option>EKO SURYONO</option>
+            <option>ELYA KANDAU</option>
+            <option>EMELDA</option>
+            <option>ESPAHANI</option>
+            <option>FITRIANI</option>
+            <option>FREEADI</option>
+            <option>HENGKY KUSUMA INDRA</option>
+            <option>HERY PRAMONO</option>
+            <option>IBNU ROSIHAN</option>
+            <option>IMANSYAH</option>
+            <option>IRLAH</option>
+            <option>IWAN APRIANTO</option>
+            <option>JAKA SUBHAN</option>
+            <option>JAWARI</option>
+            <option>JAYA HARTO</option>
+            <option>JUANDA</option>
+            <option>JUANDI</option>
+            <option>JUMIATI</option>
+            <option>KAMRAN</option>
+            <option>KARNILA</option>
+            <option>K.BUDIMAN</option>
+            <option>LILI SINTA RUSTIKA</option>
+            <option>MARNI</option>
+            <option>MUHAMMAD IRHAMSYAH</option>
+            <option>MUHAMMAD SAHADI</option>
+            <option>MULYADI</option>
+            <option>MURNI HADI</option>
+            <option>MURNIATI</option>
+            <option>NAZRULLAH</option>
+            <option>NEVI ARYATI</option>
+            <option>NIRLAWATI</option>
+            <option>NINING MUSWANI</option>
+            <option>NOVI YANA</option>
+            <option>NURLENA</option>
+            <option>NURHAYATI</option>
+            <option>NUR LAILA SARI</option>
+            <option>RAKHMAD BURHAN</option>
+            <option>RENA</option>
+            <option>RIAN PRASOJO</option>
+            <option>RIZA NOVINA</option>
+            <option>ROMI</option>
+            <option>RONA NURBAYA</option>
+            <option>RUSDIANSYAH</option>
+            <option>SAMTIDAR</option>
+            <option>SAR'ANI</option>
+            <option>SARTINI</option>
+            <option>SAPTINO</option>
+            <option>STEPHANUS PUJI SETIAWAN</option>
+            <option>SUHAIMI</option>
+            <option>SUDARTO</option>
+            <option>SUMIATI</option>
+            <option>SUPARJO</option>
+            <option>SURIYANTO</option>
+            <option>TAUPIT</option>
+            <option>TEGUH PRIONO</option>
+            <option>TULUS PRIADI</option>
+            <option>U. NASHIRUDDIN</option>
+            <option>VOLENDI</option>
+            <option>WAHIDAH</option>
+            <option>WINARDI</option>
+            <option>WIWIT</option>
+            <option>YANTI</option>
+            <option>YENI DARMILA</option>
+            <option>YUNIA</option>
+            <option>YUSNANI</option>
+            <option>ZULPIANA</option>
+          </select>
+        </div>
+        
+        <button type="submit" class="login-btn">🚀 Login</button>
+      </form>
+      
+      <div class="admin-link">
+        <a href="#" onclick="switchToAdminLogin()">Login sebagai Admin</a>
+      </div>
+    </div>
+  </div>
+
   <!-- Auth Protection Overlay -->
-  <div id="authProtection" class="auth-protection">
+  <div id="authProtection" class="auth-protection" style="display: none;">
     <div class="auth-loading">
       <div class="spinner"></div>
       <h3>Memverifikasi akses...</h3>
@@ -347,6 +622,20 @@
     <button onclick="logout()">Logout</button>
   </div>
 
+  <!-- Month Lock Warning -->
+  <div id="monthLockWarning" class="month-lock-warning">
+    <h3>🔒 Bulan Terkunci</h3>
+    <p id="monthLockMessage">Input untuk bulan ini telah dikunci oleh administrator.</p>
+    <button onclick="hideMonthLockWarning()">Mengerti</button>
+  </div>
+
+  <!-- Admin Broadcast Message -->
+  <div id="adminMessage" class="admin-message">
+    <button class="close-btn" onclick="closeAdminMessage()">×</button>
+    <h4>📢 Pesan Admin</h4>
+    <p id="adminMessageText"></p>
+  </div>
+
   <!-- Offline Status Indicators -->
   <div id="offlineStatus" class="offline-status">
     📡 Status Koneksi
@@ -360,8 +649,9 @@
   <div class="main-header">
     <div class="user-info">
       <div class="session-info">
-        <div>Kode: <span id="userCode">***</span></div>
+        <div>User: <span id="userCode">***</span></div>
         <div>Login: <span id="loginTime">***</span></div>
+        <div>Sisa: <span id="timeRemaining">***</span></div>
       </div>
       <button class="logout-btn" onclick="logout()">🚪 Logout</button>
     </div>
@@ -411,96 +701,7 @@
             </select>
 
             <label>Nama Penyuluh:</label>
-            <select name="nama" required>
-              <option value="">-- Pilih Penyuluh --</option>
-              <option>A.PURNAMA PUTRA</option>
-              <option>AAN PUJINURINSAN</option>
-              <option>ABDUL RAHMAN</option>
-              <option>AGUS SAIFUDDIN</option>
-              <option>AGUSMANTO</option>
-              <option>AHADI</option>
-              <option>ALMIZAN</option>
-              <option>ALWAN SASRUDIN</option>
-              <option>ANDI</option>
-              <option>ANDI WIHARDI</option>
-              <option>ANDI WILLIAM</option>
-              <option>ANTO SAPUTRA</option>
-              <option>ARAMIYA</option>
-              <option>BUDI SETIAWAN</option>
-              <option>DARMA IRAWAN</option>
-              <option>DARMADI</option>
-              <option>DARUSSALAM</option>
-              <option>DINO</option>
-              <option>DIYANTO</option>
-              <option>EDI WAHYUDI</option>
-              <option>EDWARDI</option>
-              <option>EKO SURYONO</option>
-              <option>ELYA KANDAU</option>
-              <option>EMELDA</option>
-              <option>ESPAHANI</option>
-              <option>FITRIANI</option>
-              <option>FREEADI</option>
-              <option>HENGKY KUSUMA INDRA</option>
-              <option>HERY PRAMONO</option>
-              <option>IBNU ROSIHAN</option>
-              <option>IMANSYAH</option>
-              <option>IRLAH</option>
-              <option>IWAN APRIANTO</option>
-              <option>JAKA SUBHAN</option>
-              <option>JAWARI</option>
-              <option>JAYA HARTO</option>
-              <option>JUANDA</option>
-              <option>JUANDI</option>
-              <option>JUMIATI</option>
-              <option>KAMRAN</option>
-              <option>KARNILA</option>
-              <option>K.BUDIMAN</option>
-              <option>LILI SINTA RUSTIKA</option>
-              <option>MARNI</option>
-              <option>MUHAMMAD IRHAMSYAH</option>
-              <option>MUHAMMAD SAHADI</option>
-              <option>MULYADI</option>
-              <option>MURNI HADI</option>
-              <option>MURNIATI</option>
-              <option>NAZRULLAH</option>
-              <option>NEVI ARYATI</option>
-              <option>NIRLAWATI</option>
-              <option>NINING MUSWANI</option>
-              <option>NOVI YANA</option>
-              <option>NURLENA</option>
-              <option>NURHAYATI</option>
-              <option>NUR LAILA SARI</option>
-              <option>RAKHMAD BURHAN</option>
-              <option>RENA</option>
-              <option>RIAN PRASOJO</option>
-              <option>RIZA NOVINA</option>
-              <option>ROMI</option>
-              <option>RONA NURBAYA</option>
-              <option>RUSDIANSYAH</option>
-              <option>SAMTIDAR</option>
-              <option>SAR'ANI</option>
-              <option>SARTINI</option>
-              <option>SAPTINO</option>
-              <option>STEPHANUS PUJI SETIAWAN</option>
-              <option>SUHAIMI</option>
-              <option>SUDARTO</option>
-              <option>SUMIATI</option>
-              <option>SUPARJO</option>
-              <option>SURIYANTO</option>
-              <option>TAUPIT</option>
-              <option>TEGUH PRIONO</option>
-              <option>TULUS PRIADI</option>
-              <option>U. NASHIRUDDIN</option>
-              <option>VOLENDI</option>
-              <option>WAHIDAH</option>
-              <option>WINARDI</option>
-              <option>WIWIT</option>
-              <option>YANTI</option>
-              <option>YENI DARMILA</option>
-              <option>YUNIA</option>
-              <option>YUSNANI</option>
-              <option>ZULPIANA</option>
-            </select>
+            <input type="text" name="nama" id="formPenyuluhName" readonly style="background: #f8f9fa;" />
 
             <label>Kecamatan</label>
             <select name="Kecamatan" id="kecamatanSelect" required></select>
@@ -614,43 +815,55 @@
   <script src="https://cdn.jsdelivr.net/npm/smartwizard@6/dist/js/jquery.smartWizard.min.js"></script>
   
   <script>
-    // ============ AUTHENTICATION SYSTEM ============
+    // ============ CONFIGURATION ============
     
-    const SESSION_KEY = 'ltt_session';
-    const SESSION_DURATION = 8 * 60 * 60 * 1000; // 8 jam
-    const WARNING_TIME = 5 * 60 * 1000; // Warning 5 menit sebelum expired
+    const CONFIG = {
+      scriptURL: 'https://script.google.com/macros/s/AKfycbwudT-kBFuokAH3XwPv8Nlt7O-3AN4cm2YDZt2bnJlUvRNNcO3BGwmtM_6rhej9-oTg/exec',
+      perPage: 5,
+      sessionKey: 'ltt_user_session',
+      adminSessionKey: 'ltt_admin_session'
+    };
+
+    // ============ GLOBAL VARIABLES ============
+    
+    let currentSession = null;
+    let allData = [], originalData = [], currentPage = 1;
+    let isOnline = navigator.onLine;
+    let autoSaveTimeout = null;
     let sessionWarningInterval = null;
     let sessionCheckInterval = null;
+    let timeRemainingInterval = null;
 
-    // Auth object untuk mengelola autentikasi
-    const LTTAuth = {
+    // Header yang sesuai dengan urutan di spreadsheet
+    const defaultHeaders = [
+      "Timestamp", "Periode Monitoring", "Nama Penyuluh", "Kecamatan", "Desa",
+      "LTT Padi Reguler (Ha)", "LTT Padi Oplah (Ha)", "LTT Padi Irigasi Pompa (Ha)",
+      "LTP Padi Reguler (Ha)", "Provitas Padi Reguler (Ku/Ha)", "LTP Padi Oplah (Ha)",
+      "Provitas Padi Oplah (Ku/Ha)", "LTP Padi Irigasi Pompa (Ha)", "Provitas Padi irigasi Pompa (Ku/Ha)",
+      "LTT Padi Gogo / Lahan Kering", "LTP Padi Gogo / Lahan Kering", "LTT Jagung (Ha)",
+      "LTP Jagung (Ha)", "Provitas Jagung (Ku/Ha)", "Luas Baku Sawah (LBS)",
+      "IP Existing", "Luas Tanam Tahun Sebelumnya (Ha)", "Provitas Padi Gogo (Ku/Ha)"
+    ];
+
+    // ============ AUTHENTICATION SYSTEM ============
+    
+    const AuthSystem = {
+      // Check if user is logged in
       isLoggedIn: function() {
-        const session = localStorage.getItem(SESSION_KEY);
+        const session = localStorage.getItem(CONFIG.sessionKey);
         if (!session) return false;
         
         try {
           const sessionData = JSON.parse(session);
-          return Date.now() < sessionData.expiresAt;
+          return Date.now() < sessionData.expiresAt && sessionData.sessionId;
         } catch {
           return false;
         }
       },
       
-      logout: function() {
-        localStorage.removeItem(SESSION_KEY);
-        window.location.href = 'login.html';
-      },
-      
-      requireAuth: function() {
-        if (!this.isLoggedIn()) {
-          window.location.href = 'login.html';
-          return false;
-        }
-        return true;
-      },
-      
+      // Get current session
       getSession: function() {
-        const session = localStorage.getItem(SESSION_KEY);
+        const session = localStorage.getItem(CONFIG.sessionKey);
         if (!session) return null;
         
         try {
@@ -659,78 +872,252 @@
           return null;
         }
       },
-
-      extendSession: function() {
+      
+      // Save session
+      saveSession: function(sessionData) {
+        localStorage.setItem(CONFIG.sessionKey, JSON.stringify(sessionData));
+        currentSession = sessionData;
+      },
+      
+      // Clear session
+      clearSession: function() {
+        localStorage.removeItem(CONFIG.sessionKey);
+        currentSession = null;
+      },
+      
+      // Login user
+      login: async function(accessCode, penyuluhName) {
+        try {
+          const formData = new FormData();
+          formData.append('action', 'login');
+          formData.append('access_code', accessCode);
+          formData.append('penyuluh_name', penyuluhName);
+          
+          const response = await fetch(CONFIG.scriptURL, {
+            method: 'POST',
+            body: formData
+          });
+          
+          const result = await response.json();
+          
+          if (result.success) {
+            this.saveSession(result.session);
+            return { success: true, session: result.session };
+          } else {
+            return { success: false, error: result.error };
+          }
+        } catch (error) {
+          console.error('Login error:', error);
+          return { success: false, error: 'Koneksi bermasalah. Silakan coba lagi.' };
+        }
+      },
+      
+      // Logout user
+      logout: async function() {
         const session = this.getSession();
         if (session) {
-          session.expiresAt = Date.now() + SESSION_DURATION;
-          localStorage.setItem(SESSION_KEY, JSON.stringify(session));
-          this.hideSessionWarning();
-          showToast('✅ Sesi berhasil diperpanjang', true);
+          try {
+            const formData = new FormData();
+            formData.append('action', 'logout');
+            formData.append('session_id', session.sessionId);
+            
+            await fetch(CONFIG.scriptURL, {
+              method: 'POST',
+              body: formData
+            });
+          } catch (error) {
+            console.log('Logout API call failed:', error);
+          }
         }
+        
+        this.clearSession();
+        this.showLogin();
+      },
+      
+      // Validate session with server
+      validateSession: async function() {
+        const session = this.getSession();
+        if (!session) return false;
+        
+        try {
+          const formData = new FormData();
+          formData.append('action', 'validate_session');
+          formData.append('session_id', session.sessionId);
+          
+          const response = await fetch(CONFIG.scriptURL, {
+            method: 'POST',
+            body: formData
+          });
+          
+          const result = await response.json();
+          
+          if (result.success && result.session) {
+            // Update local session with server data
+            const updatedSession = { ...session, ...result.session };
+            this.saveSession(updatedSession);
+            return true;
+          } else {
+            this.clearSession();
+            return false;
+          }
+        } catch (error) {
+          console.log('Session validation failed:', error);
+          return false;
+        }
+      },
+      
+      // Extend session
+      extendSession: async function() {
+        const session = this.getSession();
+        if (!session) return false;
+        
+        try {
+          const formData = new FormData();
+          formData.append('action', 'extend_session');
+          formData.append('session_id', session.sessionId);
+          
+          const response = await fetch(CONFIG.scriptURL, {
+            method: 'POST',
+            body: formData
+          });
+          
+          const result = await response.json();
+          
+          if (result.success) {
+            session.expiresAt = result.newExpiresAt;
+            this.saveSession(session);
+            hideSessionWarning();
+            showToast('✅ Sesi berhasil diperpanjang', true);
+            return true;
+          }
+        } catch (error) {
+          console.log('Extend session failed:', error);
+        }
+        
+        return false;
+      },
+      
+      // Show login form
+      showLogin: function() {
+        document.getElementById('loginContainer').style.display = 'flex';
+        document.getElementById('authProtection').style.display = 'none';
+        
+        // Clear intervals
+        if (sessionCheckInterval) clearInterval(sessionCheckInterval);
+        if (sessionWarningInterval) clearInterval(sessionWarningInterval);
+        if (timeRemainingInterval) clearInterval(timeRemainingInterval);
+      },
+      
+      // Hide login form
+      hideLogin: function() {
+        document.getElementById('loginContainer').style.display = 'none';
       }
     };
 
-    // Check authentication saat halaman dimuat
-    function checkAuthentication() {
-      const authProtection = document.getElementById('authProtection');
-      
-      if (!LTTAuth.isLoggedIn()) {
-        // Tidak ada sesi valid, redirect ke login
-        setTimeout(() => {
-          window.location.href = 'login.html';
-        }, 1500);
-        return false;
-      }
-      
-      // Sesi valid, sembunyikan protection overlay
-      authProtection.style.display = 'none';
-      
-      // Update user info di header
-      updateUserInfo();
-      
-      // Start session monitoring
-      startSessionMonitoring();
-      
-      return true;
-    }
-
-    // Update informasi user di header
-    function updateUserInfo() {
-      const session = LTTAuth.getSession();
-      if (session) {
-        document.getElementById('userCode').textContent = session.accessCode;
-        document.getElementById('loginTime').textContent = new Date(session.loginTime).toLocaleTimeString();
-      }
-    }
-
-    // Monitoring sesi
-    // Enhanced session monitoring with admin integration
-function startSessionMonitoring() {
-  // Check session setiap 30 detik
-  sessionCheckInterval = setInterval(() => {
-    if (!LTTAuth.isLoggedIn()) {
-      LTTAuth.logout();
-      return;
-    }
+    // ============ MONTH LOCK SYSTEM ============
     
-    const session = LTTAuth.getSession();
-    if (session) {
-      const timeLeft = session.expiresAt - Date.now();
+    const MonthLockSystem = {
+      // Check if month is locked
+      checkMonthLock: async function(timestamp) {
+        try {
+          const response = await fetch(CONFIG.scriptURL + '?config=1');
+          const config = await response.json();
+          
+          if (config.monthLock && config.monthLock.enabled) {
+            const inputDate = new Date(timestamp);
+            const inputMonth = inputDate.getMonth() + 1;
+            const inputYear = inputDate.getFullYear();
+            
+            if (inputMonth == config.monthLock.month && inputYear == config.monthLock.year) {
+              return {
+                locked: true,
+                message: config.monthLock.message || `Input untuk bulan ${inputMonth}/${inputYear} telah dikunci oleh administrator.`
+              };
+            }
+          }
+          
+          return { locked: false };
+        } catch (error) {
+          console.log('Month lock check failed:', error);
+          return { locked: false };
+        }
+      },
       
-      // Check for admin-forced session settings
-      const sessionSettings = JSON.parse(localStorage.getItem('ltt_session_settings') || '{}');
-      const warningTime = (sessionSettings.warningTime || 5) * 60 * 1000;
-      
-      // Show warning jika sisa waktu <= warning time
-      if (timeLeft <= warningTime && timeLeft > 0) {
-        showSessionWarning(Math.ceil(timeLeft / 60000)); // Convert ke menit
+      // Show month lock warning
+      showWarning: function(message) {
+        document.getElementById('monthLockMessage').textContent = message;
+        document.getElementById('monthLockWarning').style.display = 'block';
       }
-    }
-  }, 30000);
-}
+    };
 
-    // Tampilkan peringatan sesi akan habis
+    // ============ ADMIN MESSAGE SYSTEM ============
+    
+    const AdminMessageSystem = {
+      // Check for admin messages
+      checkAdminMessages: function() {
+        const broadcast = localStorage.getItem('ltt_admin_broadcast');
+        if (broadcast) {
+          try {
+            const message = JSON.parse(broadcast);
+            const lastShown = localStorage.getItem('ltt_last_admin_message_id');
+            
+            if (message.id.toString() !== lastShown) {
+              this.showMessage(message.message);
+              localStorage.setItem('ltt_last_admin_message_id', message.id.toString());
+            }
+          } catch (e) {
+            console.log('Error parsing admin message:', e);
+          }
+        }
+      },
+      
+      // Show admin message
+      showMessage: function(text) {
+        document.getElementById('adminMessageText').textContent = text;
+        document.getElementById('adminMessage').style.display = 'block';
+        
+        // Auto hide after 10 seconds
+        setTimeout(() => {
+          this.hideMessage();
+        }, 10000);
+      },
+      
+      // Hide admin message
+      hideMessage: function() {
+        document.getElementById('adminMessage').style.display = 'none';
+      }
+    };
+
+    // ============ SESSION MONITORING ============
+    
+    function startSessionMonitoring() {
+      // Check session every 30 seconds
+      sessionCheckInterval = setInterval(async () => {
+        const isValid = await AuthSystem.validateSession();
+        if (!isValid) {
+          showToast('❌ Sesi telah berakhir. Silakan login kembali.', false);
+          setTimeout(() => AuthSystem.logout(), 2000);
+          return;
+        }
+        
+        const session = AuthSystem.getSession();
+        if (session) {
+          const timeLeft = session.expiresAt - Date.now();
+          const warningTime = 5 * 60 * 1000; // 5 menit
+          
+          // Show warning jika sisa waktu <= 5 menit
+          if (timeLeft <= warningTime && timeLeft > 0) {
+            showSessionWarning(Math.ceil(timeLeft / 60000));
+          }
+        }
+      }, 30000);
+      
+      // Update time remaining display every minute
+      timeRemainingInterval = setInterval(() => {
+        updateTimeRemainingDisplay();
+      }, 60000);
+    }
+
     function showSessionWarning(minutesLeft) {
       const warningEl = document.getElementById('sessionWarning');
       const countdownEl = document.getElementById('sessionCountdown');
@@ -741,7 +1128,7 @@ function startSessionMonitoring() {
       // Update countdown setiap menit
       if (!sessionWarningInterval) {
         sessionWarningInterval = setInterval(() => {
-          const session = LTTAuth.getSession();
+          const session = AuthSystem.getSession();
           if (!session) {
             clearInterval(sessionWarningInterval);
             sessionWarningInterval = null;
@@ -754,7 +1141,7 @@ function startSessionMonitoring() {
           if (minutes <= 0) {
             clearInterval(sessionWarningInterval);
             sessionWarningInterval = null;
-            LTTAuth.logout();
+            AuthSystem.logout();
             return;
           }
           
@@ -763,7 +1150,6 @@ function startSessionMonitoring() {
       }
     }
 
-    // Sembunyikan peringatan sesi
     function hideSessionWarning() {
       document.getElementById('sessionWarning').style.display = 'none';
       if (sessionWarningInterval) {
@@ -772,35 +1158,71 @@ function startSessionMonitoring() {
       }
     }
 
-    // Global functions untuk button
-    function extendSession() {
-      LTTAuth.extendSession();
-    }
-
-    function logout() {
-      if (confirm('Apakah Anda yakin ingin logout?')) {
-        LTTAuth.logout();
+    function updateTimeRemainingDisplay() {
+      const session = AuthSystem.getSession();
+      if (session) {
+        const timeLeft = session.expiresAt - Date.now();
+        const hours = Math.floor(timeLeft / (1000 * 60 * 60));
+        const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+        
+        if (timeLeft > 0) {
+          document.getElementById('timeRemaining').textContent = `${hours}j ${minutes}m`;
+        } else {
+          document.getElementById('timeRemaining').textContent = 'Expired';
+        }
       }
     }
 
-    // ============ ORIGINAL FORM FUNCTIONALITY ============
-    
-    const scriptURL = 'https://script.google.com/macros/s/AKfycbxtLuzXyAmmYfQJFCNGZmQSX875n_2bo9azkMvc8D8zFa9NC8HM5m6M0PG_Y1Bi9_ORrQ/exec';
-    const perPage = 5;
-    let allData = [], originalData = [], currentPage = 1;
-    let isOnline = navigator.onLine;
-    let autoSaveTimeout = null;
+    function updateUserInfo() {
+      const session = AuthSystem.getSession();
+      if (session) {
+        document.getElementById('userCode').textContent = session.userCode;
+        document.getElementById('loginTime').textContent = new Date(session.loginTime).toLocaleTimeString();
+        document.getElementById('formPenyuluhName').value = session.penyuluhName;
+        updateTimeRemainingDisplay();
+      }
+    }
 
-    // Header yang sesuai dengan urutan di spreadsheet yang diinginkan
-    const defaultHeaders = [
-      "Timestamp", "Periode Monitoring", "Nama Penyuluh", "Kecamatan", "Desa",
-      "LTT Padi Reguler (Ha)", "LTT Padi Oplah (Ha)", "LTT Padi Irigasi Pompa (Ha)",
-      "LTP Padi Reguler (Ha)", "Provitas Padi Reguler (Ku/Ha)", "LTP Padi Oplah (Ha)",
-      "Provitas Padi Oplah (Ku/Ha)", "LTP Padi Irigasi Pompa (Ha)", "Provitas Padi irigasi Pompa (Ku/Ha)",
-      "LTT Padi Gogo / Lahan Kering", "LTP Padi Gogo / Lahan Kering", "LTT Jagung (Ha)",
-      "LTP Jagung (Ha)", "Provitas Jagung (Ku/Ha)", "Luas Baku Sawah (LBS)",
-      "IP Existing", "Luas Tanam Tahun Sebelumnya (Ha)", "Provitas Padi Gogo (Ku/Ha)"
-    ];
+    // ============ LOGIN FORM HANDLING ============
+    
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const accessCode = document.getElementById('accessCode').value;
+      const penyuluhName = document.getElementById('penyuluhName').value;
+      const errorEl = document.getElementById('loginError');
+      
+      if (!accessCode || !penyuluhName) {
+        errorEl.textContent = 'Semua field harus diisi';
+        errorEl.style.display = 'block';
+        return;
+      }
+      
+      // Show loading
+      const submitBtn = e.target.querySelector('button[type="submit"]');
+      submitBtn.textContent = '⏳ Memproses...';
+      submitBtn.disabled = true;
+      
+      // Attempt login
+      const result = await AuthSystem.login(accessCode, penyuluhName);
+      
+      if (result.success) {
+        AuthSystem.hideLogin();
+        initializeApp();
+        showToast('✅ Login berhasil!', true);
+      } else {
+        errorEl.textContent = result.error;
+        errorEl.style.display = 'block';
+      }
+      
+      // Reset button
+      submitBtn.textContent = '🚀 Login';
+      submitBtn.disabled = false;
+    });
+
+    function switchToAdminLogin() {
+      window.location.href = 'admin.html';
+    }
 
     // ============ OFFLINE FUNCTIONALITY ============
     
@@ -949,6 +1371,12 @@ function startSessionMonitoring() {
         const submission = pendingSubmissions[i];
         const formData = new FormData();
         
+        // Add session info
+        const session = AuthSystem.getSession();
+        if (session) {
+          formData.append('session_id', session.sessionId);
+        }
+        
         for (let key in submission) {
           if (!key.startsWith('_')) {
             formData.append(key, submission[key]);
@@ -956,12 +1384,14 @@ function startSessionMonitoring() {
         }
         
         try {
-          const response = await fetch(scriptURL, {
+          const response = await fetch(CONFIG.scriptURL, {
             method: 'POST',
             body: formData
           });
           
-          if (response.ok) {
+          const result = await response.json();
+          
+          if (result.success) {
             successCount++;
             pendingSubmissions.splice(i, 1);
             i--;
@@ -1002,7 +1432,7 @@ function startSessionMonitoring() {
       for (let key in savedData) {
         if (!key.startsWith('_')) {
           const input = form.querySelector(`[name="${key}"]`);
-          if (input) {
+          if (input && input.id !== 'formPenyuluhName') { // Don't restore readonly field
             input.value = savedData[key];
             
             if (input.tagName === 'SELECT') {
@@ -1032,8 +1462,8 @@ function startSessionMonitoring() {
         `<th class="${i === 2 ? 'sticky-col-3' : ''}">${h}</th>`
       ).join('') + '</tr>';
 
-      const start = (page - 1) * perPage;
-      const end = start + perPage;
+      const start = (page - 1) * CONFIG.perPage;
+      const end = start + CONFIG.perPage;
       const pageData = allData.slice(start, end);
 
       // Buat baris data
@@ -1051,7 +1481,7 @@ function startSessionMonitoring() {
       // Pagination
       const pagination = document.getElementById("pagination");
       pagination.innerHTML = '';
-      const totalPages = Math.ceil(allData.length / perPage);
+      const totalPages = Math.ceil(allData.length / CONFIG.perPage);
       for (let i = 1; i <= totalPages; i++) {
         const btn = document.createElement("button");
         btn.textContent = i;
@@ -1063,12 +1493,12 @@ function startSessionMonitoring() {
 
     function loadData() {
       // Check auth before loading data
-      if (!LTTAuth.isLoggedIn()) {
-        LTTAuth.logout();
+      if (!AuthSystem.isLoggedIn()) {
+        AuthSystem.logout();
         return;
       }
 
-      fetch(scriptURL + '?read=1')
+      fetch(CONFIG.scriptURL + '?read=1')
         .then(res => res.json())
         .then(data => {
           originalData = data.slice(1).reverse();
@@ -1083,8 +1513,8 @@ function startSessionMonitoring() {
 
     function exportTableToExcel(filename = 'data_ltt_ltp.xls') {
       // Check auth before export
-      if (!LTTAuth.isLoggedIn()) {
-        LTTAuth.logout();
+      if (!AuthSystem.isLoggedIn()) {
+        AuthSystem.logout();
         return;
       }
 
@@ -1122,8 +1552,8 @@ function startSessionMonitoring() {
       e.preventDefault();
       
       // Check auth before submit
-      if (!LTTAuth.isLoggedIn()) {
-        LTTAuth.logout();
+      if (!AuthSystem.isLoggedIn()) {
+        AuthSystem.logout();
         return;
       }
 
@@ -1137,6 +1567,19 @@ function startSessionMonitoring() {
         const dt = new Date(rawTimestamp);
         const formatted = `${dt.getMonth() + 1}/${dt.getDate()}/${dt.getFullYear()} ${String(dt.getHours()).padStart(2, '0')}:${String(dt.getMinutes()).padStart(2, '0')}:00`;
         formData.set("Timestamp", formatted);
+        
+        // Check month lock
+        const lockCheck = await MonthLockSystem.checkMonthLock(rawTimestamp);
+        if (lockCheck.locked) {
+          MonthLockSystem.showWarning(lockCheck.message);
+          return;
+        }
+      }
+
+      // Add session info
+      const session = AuthSystem.getSession();
+      if (session) {
+        formData.append('session_id', session.sessionId);
       }
 
       // Disable submit button
@@ -1148,6 +1591,7 @@ function startSessionMonitoring() {
         showToast("📱 Offline: Data disimpan lokal dan akan dikirim otomatis saat online", true);
         form.reset();
         localStorage.removeItem('ltt_form_data');
+        updateUserInfo(); // Restore user info after form reset
         submitButton.disabled = false;
         return;
       }
@@ -1156,19 +1600,22 @@ function startSessionMonitoring() {
       showLoading();
       
       try {
-        const response = await fetch(scriptURL, {
+        const response = await fetch(CONFIG.scriptURL, {
           method: 'POST',
           body: formData
         });
         
-        if (response.ok) {
+        const result = await response.json();
+        
+        if (result.success) {
           showToast("✅ Data berhasil dikirim", true);
           form.reset();
           localStorage.removeItem('ltt_form_data');
+          updateUserInfo(); // Restore user info after form reset
           loadData();
           document.querySelector(".table-wrapper").scrollIntoView({ behavior: 'smooth' });
         } else {
-          throw new Error('Server error');
+          throw new Error(result.error || 'Server error');
         }
       } catch (error) {
         // Jika gagal kirim online, simpan ke queue offline
@@ -1176,6 +1623,7 @@ function startSessionMonitoring() {
         showToast("⚠️ Koneksi bermasalah. Data disimpan lokal dan akan dikirim otomatis saat koneksi stabil", false);
         form.reset();
         localStorage.removeItem('ltt_form_data');
+        updateUserInfo(); // Restore user info after form reset
       } finally {
         hideLoading();
         submitButton.disabled = false;
@@ -1240,15 +1688,72 @@ function startSessionMonitoring() {
       });
     });
 
+    // ============ BROADCAST CHANNEL COMMUNICATION ============
+    
+    // Listen for admin updates
+    if (typeof BroadcastChannel !== 'undefined') {
+      const channel = new BroadcastChannel('ltt_admin_updates');
+      
+      channel.addEventListener('message', (event) => {
+        const { type, data } = event.data;
+        
+        switch (type) {
+          case 'FORCE_LOGOUT':
+            if (currentSession && currentSession.userCode === data.userId) {
+              showToast('❌ Anda telah di-logout oleh administrator', false);
+              setTimeout(() => AuthSystem.logout(), 2000);
+            }
+            break;
+            
+          case 'FORCE_LOGOUT_ALL':
+            showToast('❌ Semua user telah di-logout oleh administrator', false);
+            setTimeout(() => AuthSystem.logout(), 2000);
+            break;
+            
+          case 'MONTH_LOCK_UPDATE':
+            // Month lock settings updated
+            break;
+            
+          case 'SESSION_SETTINGS_UPDATE':
+            // Session settings updated
+            break;
+            
+          case 'ADMIN_MESSAGE':
+            AdminMessageSystem.showMessage(data.message);
+            break;
+        }
+      });
+    }
+
+    // ============ UTILITY FUNCTIONS ============
+    
+    // Global functions for UI interactions
+    function extendSession() {
+      AuthSystem.extendSession();
+    }
+
+    function logout() {
+      if (confirm('Apakah Anda yakin ingin logout?')) {
+        AuthSystem.logout();
+      }
+    }
+
+    function hideMonthLockWarning() {
+      document.getElementById('monthLockWarning').style.display = 'none';
+    }
+
+    function closeAdminMessage() {
+      AdminMessageSystem.hideMessage();
+    }
+
     // ============ INITIALIZATION ============
 
-    // Initialize app
+    // Initialize app setelah login berhasil
     function initializeApp() {
       console.log('Initializing app...');
       
-      if (!checkAuthentication()) {
-        return; // Stop initialization if not authenticated
-      }
+      // Update user info
+      updateUserInfo();
       
       // Initialize components
       populateKecamatan();
@@ -1257,6 +1762,12 @@ function startSessionMonitoring() {
       // Setup offline functionality
       updateConnectionStatus();
       setupAutoSave();
+      
+      // Start session monitoring
+      startSessionMonitoring();
+      
+      // Check for admin messages
+      AdminMessageSystem.checkAdminMessages();
       
       // Restore form data jika ada
       setTimeout(() => {
@@ -1269,6 +1780,11 @@ function startSessionMonitoring() {
           syncPendingSubmissions();
         }
       }, 30000);
+      
+      // Check admin messages every 2 minutes
+      setInterval(() => {
+        AdminMessageSystem.checkAdminMessages();
+      }, 120000);
       
       console.log('App initialized successfully');
     }
@@ -1302,25 +1818,31 @@ function startSessionMonitoring() {
           pane.style.display = 'block';
         });
       }
-      
-      // Initialize app regardless
-      initializeApp();
     }
 
-    // Check auth sebelum DOM ready
-    document.addEventListener('DOMContentLoaded', function() {
-      // Quick auth check to show protection immediately if needed
-      if (!LTTAuth.isLoggedIn()) {
-        setTimeout(() => {
-          window.location.href = 'login.html';
-        }, 1500);
-        return;
+    // Check authentication status saat halaman dimuat
+    function checkInitialAuth() {
+      if (AuthSystem.isLoggedIn()) {
+        // User sudah login, validate session dengan server
+        AuthSystem.validateSession().then(isValid => {
+          if (isValid) {
+            AuthSystem.hideLogin();
+            initializeApp();
+          } else {
+            AuthSystem.showLogin();
+          }
+        });
+      } else {
+        AuthSystem.showLogin();
       }
-    });
+    }
 
+    // ============ STARTUP SEQUENCE ============
+    
     // jQuery ready dengan fallback
     $(document).ready(function () {
       initSmartWizard();
+      checkInitialAuth();
     });
 
     // Fallback jika jQuery tidak ready
@@ -1329,7 +1851,7 @@ function startSessionMonitoring() {
         setTimeout(() => {
           if (typeof $ === 'undefined') {
             console.log('jQuery not available, initializing without SmartWizard');
-            initializeApp();
+            checkInitialAuth();
           }
         }, 1000);
       });
@@ -1337,7 +1859,7 @@ function startSessionMonitoring() {
       setTimeout(() => {
         if (typeof $ === 'undefined') {
           console.log('jQuery not available, initializing without SmartWizard');
-          initializeApp();
+          checkInitialAuth();
         }
       }, 1000);
     }
@@ -1346,8 +1868,12 @@ function startSessionMonitoring() {
     document.addEventListener('visibilitychange', function() {
       if (!document.hidden) {
         // Page visible again, check session
-        if (!LTTAuth.isLoggedIn()) {
-          LTTAuth.logout();
+        if (AuthSystem.isLoggedIn()) {
+          AuthSystem.validateSession().then(isValid => {
+            if (!isValid) {
+              AuthSystem.logout();
+            }
+          });
         }
       }
     });
@@ -1370,10 +1896,15 @@ function startSessionMonitoring() {
       if (sessionWarningInterval) {
         clearInterval(sessionWarningInterval);
       }
+      if (timeRemainingInterval) {
+        clearInterval(timeRemainingInterval);
+      }
     });
 
-    // Make LTTAuth available globally untuk debugging
-    window.LTTAuth = LTTAuth;
+    // Make objects available globally untuk debugging
+    window.AuthSystem = AuthSystem;
+    window.MonthLockSystem = MonthLockSystem;
+    window.AdminMessageSystem = AdminMessageSystem;
   </script>
 </body>
 </html>
