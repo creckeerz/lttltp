@@ -384,6 +384,32 @@
       color: #2c3e50;
     }
 
+    /* Success/Error messages */
+    .alert {
+      padding: 12px 16px;
+      border-radius: 8px;
+      margin-bottom: 15px;
+      font-weight: 500;
+    }
+
+    .alert-success {
+      background: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+
+    .alert-error {
+      background: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+
+    .alert-warning {
+      background: #fff3cd;
+      color: #856404;
+      border: 1px solid #ffeaa7;
+    }
+
     @media (max-width: 768px) {
       .admin-content {
         padding: 20px;
@@ -463,6 +489,9 @@
       <div id="month-control" class="tab-content active">
         <div class="card">
           <h3>🔒 Kontrol Kunci Bulan Timestamp</h3>
+          
+          <!-- Alert Messages -->
+          <div id="alertContainer"></div>
           
           <!-- Current Status -->
           <div class="month-lock-status">
@@ -660,7 +689,8 @@
     
     const CONFIG = {
       scriptURL: 'https://script.google.com/macros/s/AKfycbzH7ZFKlKjeFlVxvqYFwJVBNw98yYHtyFqquXcRo-gEqNDHtPM4SmQawYT_yPrZlW9g/exec',
-      adminSessionKey: 'ltt_admin_session'
+      adminSessionKey: 'ltt_admin_session',
+      configStorageKey: 'ltt_admin_config'
     };
 
     // ============ GLOBAL VARIABLES ============
@@ -773,6 +803,23 @@
       }
     }
 
+    function showAlert(message, type = 'success') {
+      const alertContainer = document.getElementById('alertContainer');
+      const alert = document.createElement('div');
+      alert.className = `alert alert-${type}`;
+      alert.textContent = message;
+      
+      alertContainer.innerHTML = '';
+      alertContainer.appendChild(alert);
+      
+      // Auto remove after 5 seconds
+      setTimeout(() => {
+        if (alert.parentNode) {
+          alert.parentNode.removeChild(alert);
+        }
+      }, 5000);
+    }
+
     function showToast(message, type = 'success') {
       const toast = document.getElementById('toast');
       toast.textContent = message;
@@ -784,13 +831,35 @@
       }, 3000);
     }
 
+    // ============ CONFIG MANAGEMENT ============
+    
+    function saveConfigLocally(config) {
+      localStorage.setItem(CONFIG.configStorageKey, JSON.stringify(config));
+      currentConfig = config;
+    }
+
+    function loadConfigLocally() {
+      const saved = localStorage.getItem(CONFIG.configStorageKey);
+      if (saved) {
+        try {
+          currentConfig = JSON.parse(saved);
+        } catch (e) {
+          console.log('Error loading config:', e);
+        }
+      }
+    }
+
     // ============ MONTH LOCK FUNCTIONALITY ============
     
     async function loadMonthControlConfig() {
       try {
+        // Load from localStorage first
+        loadConfigLocally();
+        updateLockStatusDisplay();
+        
+        // Try to sync with server if possible
         const formData = new FormData();
-        formData.append('action', 'admin_config');
-        formData.append('config_action', 'get_config');
+        formData.append('action', 'get_config');
         formData.append('session_id', currentAdminSession.sessionId);
         
         const response = await fetch(CONFIG.scriptURL, {
@@ -802,10 +871,13 @@
         
         if (result.success && result.config) {
           currentConfig = result.config;
+          saveConfigLocally(currentConfig);
           updateLockStatusDisplay();
         }
       } catch (error) {
-        console.log('Error loading month config:', error);
+        console.log('Error loading month config from server:', error);
+        // Continue with local config
+        showAlert('Menggunakan konfigurasi lokal. Koneksi server mungkin bermasalah.', 'warning');
       }
     }
 
@@ -834,6 +906,9 @@
       document.getElementById('lockedMonth').value = currentConfig.monthLock.month || '';
       document.getElementById('lockedYear').value = currentConfig.monthLock.year || new Date().getFullYear();
       document.getElementById('lockMessage').value = currentConfig.monthLock.message || '';
+      
+      // Broadcast config to all user tabs
+      broadcastConfigUpdate();
     }
 
     async function setMonthLock() {
@@ -842,15 +917,27 @@
       const message = document.getElementById('lockMessage').value;
       
       if (!month || !year) {
-        showToast('Pilih bulan dan tahun terlebih dahulu', 'error');
+        showAlert('Pilih bulan dan tahun terlebih dahulu', 'error');
         return;
       }
       
+      // Update local config immediately
+      currentConfig.monthLock = {
+        enabled: true,
+        month: parseInt(month),
+        year: parseInt(year),
+        message: message
+      };
+      
+      saveConfigLocally(currentConfig);
+      updateLockStatusDisplay();
+      
       try {
+        // Try to sync with server
         const formData = new FormData();
-        formData.append('action', 'admin_config');
-        formData.append('config_action', 'set_month_lock');
+        formData.append('action', 'set_config');
         formData.append('session_id', currentAdminSession.sessionId);
+        formData.append('config_type', 'month_lock');
         formData.append('enabled', 'true');
         formData.append('month', month);
         formData.append('year', year);
@@ -864,31 +951,29 @@
         const result = await response.json();
         
         if (result.success) {
-          currentConfig.monthLock = {
-            enabled: true,
-            month: parseInt(month),
-            year: parseInt(year),
-            message: message
-          };
-          
-          updateLockStatusDisplay();
-          showToast(`Kunci bulan ${getMonthName(month)} ${year} berhasil diaktifkan`, 'success');
+          showAlert(`Kunci bulan ${getMonthName(month)} ${year} berhasil diaktifkan dan disimpan ke server`, 'success');
         } else {
-          showToast('Gagal mengaktifkan kunci bulan', 'error');
+          showAlert(`Kunci bulan berhasil diaktifkan secara lokal. Error server: ${result.error}`, 'warning');
         }
       } catch (error) {
-        showToast('Error: ' + error.message, 'error');
+        showAlert(`Kunci bulan berhasil diaktifkan secara lokal. Koneksi server bermasalah: ${error.message}`, 'warning');
       }
     }
 
     async function toggleMonthLock() {
       const newEnabled = !currentConfig.monthLock.enabled;
       
+      // Update local config immediately
+      currentConfig.monthLock.enabled = newEnabled;
+      saveConfigLocally(currentConfig);
+      updateLockStatusDisplay();
+      
       try {
+        // Try to sync with server
         const formData = new FormData();
-        formData.append('action', 'admin_config');
-        formData.append('config_action', 'set_month_lock');
+        formData.append('action', 'set_config');
         formData.append('session_id', currentAdminSession.sessionId);
+        formData.append('config_type', 'month_lock');
         formData.append('enabled', newEnabled.toString());
         formData.append('month', currentConfig.monthLock.month || '');
         formData.append('year', currentConfig.monthLock.year || '');
@@ -901,17 +986,15 @@
         
         const result = await response.json();
         
+        const status = newEnabled ? 'diaktifkan' : 'dinonaktifkan';
         if (result.success) {
-          currentConfig.monthLock.enabled = newEnabled;
-          updateLockStatusDisplay();
-          
-          const status = newEnabled ? 'diaktifkan' : 'dinonaktifkan';
-          showToast(`Kunci bulan berhasil ${status}`, 'success');
+          showAlert(`Kunci bulan berhasil ${status} dan disimpan ke server`, 'success');
         } else {
-          showToast('Gagal mengubah status kunci bulan', 'error');
+          showAlert(`Kunci bulan berhasil ${status} secara lokal. Error server: ${result.error}`, 'warning');
         }
       } catch (error) {
-        showToast('Error: ' + error.message, 'error');
+        const status = newEnabled ? 'diaktifkan' : 'dinonaktifkan';
+        showAlert(`Kunci bulan berhasil ${status} secara lokal. Koneksi server bermasalah: ${error.message}`, 'warning');
       }
     }
 
@@ -924,16 +1007,18 @@
     function broadcastMessage() {
       const message = document.getElementById('lockMessage').value;
       if (!message.trim()) {
-        showToast('Masukkan pesan terlebih dahulu', 'error');
+        showAlert('Masukkan pesan terlebih dahulu', 'error');
         return;
       }
       
       // Simpan pesan untuk ditampilkan ke user
-      localStorage.setItem('ltt_admin_broadcast', JSON.stringify({
+      const broadcastData = {
         message: message,
         timestamp: Date.now(),
         id: Date.now()
-      }));
+      };
+      
+      localStorage.setItem('ltt_admin_broadcast', JSON.stringify(broadcastData));
       
       // Broadcast ke semua tab
       if (typeof BroadcastChannel !== 'undefined') {
@@ -944,7 +1029,24 @@
         });
       }
       
-      showToast('Pesan berhasil dikirim ke semua user', 'success');
+      showAlert('Pesan berhasil dikirim ke semua user', 'success');
+    }
+
+    function broadcastConfigUpdate() {
+      // Broadcast config update to all user tabs
+      if (typeof BroadcastChannel !== 'undefined') {
+        const channel = new BroadcastChannel('ltt_admin_updates');
+        channel.postMessage({
+          type: 'MONTH_LOCK_UPDATE',
+          data: { 
+            config: currentConfig.monthLock,
+            timestamp: Date.now()
+          }
+        });
+      }
+      
+      // Also save to a shared storage that index.html can read
+      localStorage.setItem('ltt_month_lock_config', JSON.stringify(currentConfig.monthLock));
     }
 
     // ============ USER SESSION MANAGEMENT ============
@@ -955,8 +1057,7 @@
       
       try {
         const formData = new FormData();
-        formData.append('action', 'admin_users');
-        formData.append('user_action', 'get_users');
+        formData.append('action', 'get_users');
         formData.append('session_id', currentAdminSession.sessionId);
         
         const response = await fetch(CONFIG.scriptURL, {
@@ -967,14 +1068,19 @@
         const result = await response.json();
         
         if (result.success) {
-          displayUserTable(result.users);
-          updateUserStatistics(result.users);
+          displayUserTable(result.users || []);
+          updateUserStatistics(result.users || []);
         } else {
-          showToast('Gagal memuat data user', 'error');
+          showAlert('Gagal memuat data user: ' + result.error, 'error');
+          // Show empty table
+          displayUserTable([]);
+          updateUserStatistics([]);
         }
       } catch (error) {
         console.log('Error loading user sessions:', error);
-        showToast('Error memuat data user', 'error');
+        showAlert('Error memuat data user: ' + error.message, 'error');
+        displayUserTable([]);
+        updateUserStatistics([]);
       } finally {
         document.getElementById('userLoading').style.display = 'none';
         document.getElementById('userTable').style.display = 'table';
@@ -1045,8 +1151,7 @@
       if (confirm('Perpanjang session user ini?')) {
         try {
           const formData = new FormData();
-          formData.append('action', 'admin_users');
-          formData.append('user_action', 'extend_user_session');
+          formData.append('action', 'extend_user_session');
           formData.append('session_id', currentAdminSession.sessionId);
           formData.append('target_session_id', sessionId);
           formData.append('hours', '8');
@@ -1059,13 +1164,13 @@
           const result = await response.json();
           
           if (result.success) {
-            showToast('Session user berhasil diperpanjang', 'success');
+            showAlert('Session user berhasil diperpanjang', 'success');
             setTimeout(() => loadUserSessions(), 1000);
           } else {
-            showToast('Gagal memperpanjang session', 'error');
+            showAlert('Gagal memperpanjang session: ' + result.error, 'error');
           }
         } catch (error) {
-          showToast('Error: ' + error.message, 'error');
+          showAlert('Error: ' + error.message, 'error');
         }
       }
     }
@@ -1074,8 +1179,7 @@
       if (confirm('Yakin ingin logout user ini?')) {
         try {
           const formData = new FormData();
-          formData.append('action', 'admin_users');
-          formData.append('user_action', 'terminate_user_session');
+          formData.append('action', 'force_logout_user');
           formData.append('session_id', currentAdminSession.sessionId);
           formData.append('target_session_id', sessionId);
           
@@ -1087,7 +1191,7 @@
           const result = await response.json();
           
           if (result.success) {
-            showToast('User berhasil di-logout', 'success');
+            showAlert('User berhasil di-logout', 'success');
             
             // Broadcast logout to user
             if (typeof BroadcastChannel !== 'undefined') {
@@ -1100,17 +1204,17 @@
             
             setTimeout(() => loadUserSessions(), 1000);
           } else {
-            showToast('Gagal logout user', 'error');
+            showAlert('Gagal logout user: ' + result.error, 'error');
           }
         } catch (error) {
-          showToast('Error: ' + error.message, 'error');
+          showAlert('Error: ' + error.message, 'error');
         }
       }
     }
 
     function refreshUserData() {
       loadUserSessions();
-      showToast('Data user berhasil direfresh', 'success');
+      showAlert('Data user berhasil direfresh', 'success');
     }
 
     function forceLogoutAll() {
@@ -1124,14 +1228,14 @@
           });
         }
         
-        showToast('Semua user berhasil di-logout', 'warning');
+        showAlert('Semua user berhasil di-logout', 'warning');
         setTimeout(() => loadUserSessions(), 2000);
       }
     }
 
     function extendAllSessions() {
       if (confirm('Perpanjang semua session aktif?')) {
-        showToast('Semua session aktif berhasil diperpanjang', 'success');
+        showAlert('Semua session aktif berhasil diperpanjang', 'success');
         setTimeout(() => loadUserSessions(), 1000);
       }
     }
@@ -1144,8 +1248,7 @@
       
       try {
         const formData = new FormData();
-        formData.append('action', 'admin_config');
-        formData.append('config_action', 'update_session_settings');
+        formData.append('action', 'update_session_settings');
         formData.append('session_id', currentAdminSession.sessionId);
         formData.append('duration', duration);
         formData.append('warning', warningTime);
@@ -1167,12 +1270,12 @@
             });
           }
           
-          showToast('Pengaturan session berhasil diupdate', 'success');
+          showAlert('Pengaturan session berhasil diupdate', 'success');
         } else {
-          showToast('Gagal mengupdate pengaturan session', 'error');
+          showAlert('Gagal mengupdate pengaturan session: ' + result.error, 'error');
         }
       } catch (error) {
-        showToast('Error: ' + error.message, 'error');
+        showAlert('Error: ' + error.message, 'error');
       }
     }
 
@@ -1186,7 +1289,7 @@
         recordsPerPage: parseInt(recordsPerPage)
       }));
       
-      showToast('Pengaturan data berhasil diupdate', 'success');
+      showAlert('Pengaturan data berhasil diupdate', 'success');
     }
 
     function updateSecuritySettings() {
@@ -1199,14 +1302,14 @@
         lockDuration: parseInt(lockDuration)
       }));
       
-      showToast('Pengaturan keamanan berhasil diupdate', 'success');
+      showAlert('Pengaturan keamanan berhasil diupdate', 'success');
     }
 
     // ============ DATA MONITORING ============
     
     async function loadSubmissionData() {
       try {
-        const response = await fetch(CONFIG.scriptURL + '?admin=1');
+        const response = await fetch(CONFIG.scriptURL + '?stats=1');
         const stats = await response.json();
         
         document.getElementById('todaySubmissions').textContent = stats.todaySubmissions || 0;
@@ -1216,12 +1319,18 @@
         document.getElementById('totalSubmissions').textContent = stats.totalSubmissions || 0;
       } catch (error) {
         console.log('Error loading submission data:', error);
+        // Set default values
+        document.getElementById('todaySubmissions').textContent = '0';
+        document.getElementById('weekSubmissions').textContent = '0';
+        document.getElementById('monthSubmissions').textContent = '0';
+        document.getElementById('pendingSync').textContent = '0';
+        document.getElementById('totalSubmissions').textContent = '0';
       }
     }
 
     function refreshSubmissionData() {
       loadSubmissionData();
-      showToast('Data submission berhasil direfresh', 'success');
+      showAlert('Data submission berhasil direfresh', 'success');
     }
 
     function exportSubmissionReport() {
@@ -1244,7 +1353,7 @@
       a.click();
       
       URL.revokeObjectURL(url);
-      showToast('Laporan berhasil diexport', 'success');
+      showAlert('Laporan berhasil diexport', 'success');
     }
 
     // ============ BACKUP & RESTORE ============
@@ -1266,7 +1375,7 @@
       a.click();
       
       URL.revokeObjectURL(url);
-      showToast('Backup berhasil dibuat', 'success');
+      showAlert('Backup berhasil dibuat', 'success');
     }
 
     function exportUserSessions() {
@@ -1288,13 +1397,13 @@
       a.click();
       
       URL.revokeObjectURL(url);
-      showToast('Data session berhasil diexport', 'success');
+      showAlert('Data session berhasil diexport', 'success');
     }
 
     function clearOldSessions() {
       if (confirm('Hapus semua session yang sudah expired?')) {
         // This would be handled server-side in real implementation
-        showToast('Session expired berhasil dihapus', 'success');
+        showAlert('Session expired berhasil dihapus', 'success');
       }
     }
 
@@ -1305,7 +1414,7 @@
       sessionCheckInterval = setInterval(async () => {
         const isValid = await AdminAuth.validateSession();
         if (!isValid) {
-          showToast('❌ Sesi admin telah berakhir. Silakan login kembali.', 'error');
+          showAlert('❌ Sesi admin telah berakhir. Silakan login kembali.', 'error');
           setTimeout(() => AdminAuth.logout(), 2000);
         }
       }, 30000);
@@ -1419,7 +1528,7 @@
       }
     }
 
-    // ============ AUTO REFRESH ============
+    // ============ PERIODIC DATA SYNC ============
     
     // Auto refresh user data every 30 seconds
     setInterval(() => {
@@ -1434,6 +1543,13 @@
         loadSubmissionData();
       }
     }, 60000);
+
+    // Sync config with server every 2 minutes
+    setInterval(() => {
+      if (document.getElementById('month-control').classList.contains('active')) {
+        loadMonthControlConfig();
+      }
+    }, 120000);
 
     // ============ EVENT LISTENERS ============
     
