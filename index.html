@@ -963,7 +963,7 @@
     // ============ CONFIGURATION ============
     
     const CONFIG = {
-      scriptURL: 'https://script.google.com/macros/s/AKfycby73rfC4RsRjkiStmXr96xNMCe8nfffVyEefzXKVboLFfVKPBPrMF8nxjp75zPEg0_L/exec',
+      scriptURL: 'https://script.google.com/macros/s/AKfycbz2Uxakk1ZBjF20akYUZFAj_uh0TyoTFMyYhcc-hEai6oCz8m9dSyAmNiiq-owpB7m9/exec',
       perPage: 5,
       sessionKey: 'ltt_user_session',
       adminSessionKey: 'ltt_admin_session'
@@ -1341,61 +1341,38 @@
     // ============ MONTH LOCK SYSTEM ============
     
     const MonthLockSystem = {
-  // Check if month is locked
-  checkMonthLock: async function(timestamp) {
-    try {
-      // First check localStorage (faster)
-      const localConfig = localStorage.getItem('ltt_month_lock_config');
-      if (localConfig) {
+      // Check if month is locked
+      checkMonthLock: async function(timestamp) {
         try {
-          const config = JSON.parse(localConfig);
-          if (config && config.enabled) {
+          const response = await fetch(CONFIG.scriptURL + '?config=1');
+          const config = await response.json();
+          
+          if (config.monthLock && config.monthLock.enabled) {
             const inputDate = new Date(timestamp);
             const inputMonth = inputDate.getMonth() + 1;
             const inputYear = inputDate.getFullYear();
             
-            if (inputMonth == config.month && inputYear == config.year) {
+            if (inputMonth == config.monthLock.month && inputYear == config.monthLock.year) {
               return {
                 locked: true,
-                message: config.message || `Input untuk bulan ${inputMonth}/${inputYear} telah dikunci oleh administrator.`
+                message: config.monthLock.message || `Input untuk bulan ${inputMonth}/${inputYear} telah dikunci oleh administrator.`
               };
             }
           }
-        } catch (e) {
-          console.log('Error parsing local config:', e);
+          
+          return { locked: false };
+        } catch (error) {
+          console.log('Month lock check failed:', error);
+          return { locked: false };
         }
+      },
+      
+      // Show month lock warning
+      showWarning: function(message) {
+        document.getElementById('monthLockMessage').textContent = message;
+        document.getElementById('monthLockWarning').style.display = 'block';
       }
-      
-      // Fallback: check server config
-      const response = await fetch(CONFIG.scriptURL + '?config=1');
-      const result = await response.json();
-      
-      if (result.monthLock && result.monthLock.enabled) {
-        const inputDate = new Date(timestamp);
-        const inputMonth = inputDate.getMonth() + 1;
-        const inputYear = inputDate.getFullYear();
-        
-        if (inputMonth == result.monthLock.month && inputYear == result.monthLock.year) {
-          return {
-            locked: true,
-            message: result.monthLock.message || `Input untuk bulan ${inputMonth}/${inputYear} telah dikunci oleh administrator.`
-          };
-        }
-      }
-      
-      return { locked: false };
-    } catch (error) {
-      console.log('Month lock check failed:', error);
-      return { locked: false };
-    }
-  },
-  
-  // Show month lock warning
-  showWarning: function(message) {
-    document.getElementById('monthLockMessage').textContent = message;
-    document.getElementById('monthLockWarning').style.display = 'block';
-  }
-};
+    };
 
     // ============ ADMIN MESSAGE SYSTEM ============
     
@@ -2047,45 +2024,40 @@
 
     // ============ BROADCAST CHANNEL COMMUNICATION ============
     
-   // Enhanced Broadcast Channel Communication
-if (typeof BroadcastChannel !== 'undefined') {
-  const channel = new BroadcastChannel('ltt_admin_updates');
-  
-  channel.addEventListener('message', (event) => {
-    const { type, data } = event.data;
-    
-    switch (type) {
-      case 'FORCE_LOGOUT':
-        const session = AuthSystem.getSession();
-        if (session && data.sessionId === session.sessionId) {
-          showToast('❌ Anda telah di-logout oleh administrator', false);
-          setTimeout(() => AuthSystem.logout(), 2000);
+    // Listen for admin updates
+    if (typeof BroadcastChannel !== 'undefined') {
+      const channel = new BroadcastChannel('ltt_admin_updates');
+      
+      channel.addEventListener('message', (event) => {
+        const { type, data } = event.data;
+        
+        switch (type) {
+          case 'FORCE_LOGOUT':
+            if (currentSession && currentSession.userCode === data.userId) {
+              showToast('❌ Anda telah di-logout oleh administrator', false);
+              setTimeout(() => AuthSystem.logout(), 2000);
+            }
+            break;
+            
+          case 'FORCE_LOGOUT_ALL':
+            showToast('❌ Semua user telah di-logout oleh administrator', false);
+            setTimeout(() => AuthSystem.logout(), 2000);
+            break;
+            
+          case 'MONTH_LOCK_UPDATE':
+            // Month lock settings updated
+            break;
+            
+          case 'SESSION_SETTINGS_UPDATE':
+            // Session settings updated
+            break;
+            
+          case 'ADMIN_MESSAGE':
+            AdminMessageSystem.showMessage(data.message);
+            break;
         }
-        break;
-        
-      case 'FORCE_LOGOUT_ALL':
-        showToast('❌ Semua user telah di-logout oleh administrator', false);
-        setTimeout(() => AuthSystem.logout(), 2000);
-        break;
-        
-      case 'MONTH_LOCK_UPDATE':
-        // Update local month lock config
-        if (data.config) {
-          localStorage.setItem('ltt_month_lock_config', JSON.stringify(data.config));
-          console.log('Month lock config updated from admin:', data.config);
-        }
-        break;
-        
-      case 'ADMIN_MESSAGE':
-        AdminMessageSystem.showMessage(data.message);
-        break;
-        
-      case 'SESSION_SETTINGS_UPDATE':
-        // Handle session settings update if needed
-        break;
+      });
     }
-  });
-}
 
     // ============ UTILITY FUNCTIONS ============
     
