@@ -394,11 +394,18 @@
       adminSessionKey: 'ltt_admin_session'
     };
 
-    // Tab switching
+    // Tab switching - FIXED
     function switchTab(tabType) {
       // Update tab buttons
       document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-      event.target.classList.add('active');
+      
+      // Find the clicked button and mark it active
+      const buttons = document.querySelectorAll('.tab-btn');
+      if (tabType === 'user') {
+        buttons[0].classList.add('active');
+      } else {
+        buttons[1].classList.add('active');
+      }
       
       // Update forms
       document.querySelectorAll('.login-form').forEach(form => form.classList.remove('active'));
@@ -445,7 +452,7 @@
       successEl.style.display = 'block';
     }
 
-    // User login handler
+    // User login handler - FIXED
     document.getElementById('userForm').addEventListener('submit', async (e) => {
       e.preventDefault();
       clearErrors();
@@ -474,12 +481,61 @@
         const result = await response.json();
         
         if (result.success) {
-          // Save admin session
+          // FIXED: Save USER session to USER sessionKey
+          localStorage.setItem(CONFIG.userSessionKey, JSON.stringify(result.session));
+          
+          showSuccess('user', 'Login berhasil! Mengalihkan ke halaman utama...');
+          
+          // FIXED: Redirect to index.html for users
+          setTimeout(() => {
+            window.location.href = 'index.html';
+          }, 2000);
+        } else {
+          showError('user', result.error || 'Login gagal');
+        }
+      } catch (error) {
+        console.error('User login error:', error);
+        showError('user', 'Koneksi bermasalah. Silakan coba lagi.');
+      } finally {
+        hideLoading();
+      }
+    });
+
+    // Admin login handler - FIXED
+    document.getElementById('adminForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      clearErrors();
+      
+      const accessCode = document.getElementById('adminAccessCode').value.trim();
+      const adminName = document.getElementById('adminName').value.trim();
+      
+      if (!accessCode || !adminName) {
+        showError('admin', 'Semua field harus diisi');
+        return;
+      }
+      
+      showLoading();
+      
+      try {
+        const formData = new FormData();
+        formData.append('action', 'admin_login');
+        formData.append('access_code', accessCode);
+        formData.append('admin_name', adminName);
+        
+        const response = await fetch(CONFIG.scriptURL, {
+          method: 'POST',
+          body: formData
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+          // FIXED: Save ADMIN session to ADMIN sessionKey
           localStorage.setItem(CONFIG.adminSessionKey, JSON.stringify(result.session));
           
           showSuccess('admin', 'Login admin berhasil! Mengalihkan ke panel admin...');
           
-          // Redirect to admin panel after 2 seconds
+          // FIXED: Redirect to admin.html for admins
           setTimeout(() => {
             window.location.href = 'admin.html';
           }, 2000);
@@ -539,9 +595,6 @@
       
       if (loginType === 'admin') {
         switchTab('admin');
-        // Simulate click on admin tab
-        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-        document.querySelectorAll('.tab-btn')[1].classList.add('active');
       }
     }
 
@@ -604,10 +657,6 @@
         const currentTab = document.querySelector('.tab-btn.active');
         const isUserActive = currentTab.textContent.includes('User');
         switchTab(isUserActive ? 'admin' : 'user');
-        
-        // Simulate click on the other tab
-        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-        document.querySelectorAll('.tab-btn')[isUserActive ? 1 : 0].classList.add('active');
       }
     });
 
