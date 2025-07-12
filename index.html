@@ -1128,23 +1128,17 @@
         return displayNames[fieldName] || fieldName;
       },
       
-      // Setup real-time validation untuk timestamp field
-  setupTimestampValidation: function() {
-    const timestampInput = document.querySelector('input[name="Timestamp"]');
-    if (timestampInput) {
-      timestampInput.addEventListener('change', () => {
-        this.validateTimestampInput(timestampInput);
-      });
-      
-      let validateTimeout;
-      timestampInput.addEventListener('input', () => {
-        clearTimeout(validateTimeout);
-        validateTimeout = setTimeout(() => {
-          this.validateTimestampInput(timestampInput);
-        }, 500);
-      });
-    }
-  },
+      // Setup real-time validation
+      setupRealTimeValidation: function(form) {
+        const fields = form.querySelectorAll('input, select');
+        
+        fields.forEach(field => {
+          // Validate on blur
+          field.addEventListener('blur', () => {
+            if (field.value.trim() || field.hasAttribute('required')) {
+              this.validateField(field);
+            }
+          });
           
           // Clear error on input
           field.addEventListener('input', () => {
@@ -1347,69 +1341,38 @@
     // ============ MONTH LOCK SYSTEM ============
     
     const MonthLockSystem = {
-  // Check if month is locked dari admin settings
-  checkMonthLock: function(timestamp) {
-    try {
-      // Ambil konfigurasi dari localStorage yang di-set oleh admin.html
-      const adminConfig = localStorage.getItem('ltt_month_lock_config');
-      
-      if (adminConfig) {
-        const lockConfig = JSON.parse(adminConfig);
-        
-        if (lockConfig.enabled) {
-          const inputDate = new Date(timestamp);
-          const inputMonth = inputDate.getMonth() + 1;
-          const inputYear = inputDate.getFullYear();
+      // Check if month is locked
+      checkMonthLock: async function(timestamp) {
+        try {
+          const response = await fetch(CONFIG.scriptURL + '?config=1');
+          const config = await response.json();
           
-          if (inputMonth == lockConfig.month && inputYear == lockConfig.year) {
-            return {
-              locked: true,
-              message: lockConfig.message || `Input untuk bulan ${inputMonth}/${inputYear} telah dikunci oleh administrator.`
-            };
+          if (config.monthLock && config.monthLock.enabled) {
+            const inputDate = new Date(timestamp);
+            const inputMonth = inputDate.getMonth() + 1;
+            const inputYear = inputDate.getFullYear();
+            
+            if (inputMonth == config.monthLock.month && inputYear == config.monthLock.year) {
+              return {
+                locked: true,
+                message: config.monthLock.message || `Input untuk bulan ${inputMonth}/${inputYear} telah dikunci oleh administrator.`
+              };
+            }
           }
+          
+          return { locked: false };
+        } catch (error) {
+          console.log('Month lock check failed:', error);
+          return { locked: false };
         }
-      }
-      
-      return { locked: false };
-    } catch (error) {
-      console.log('Month lock check failed:', error);
-      return { locked: false };
-    }
-  },
+      },
       
       // Show month lock warning
-  showWarning: function(message) {
-    document.getElementById('monthLockMessage').textContent = message;
-    document.getElementById('monthLockWarning').style.display = 'block';
-  },
-
-
-          // Validate timestamp input secara real-time
-  validateTimestampInput: function(timestampInput) {
-    if (!timestampInput.value) return true;
-    
-    const lockCheck = this.checkMonthLock(timestampInput.value);
-    if (lockCheck.locked) {
-      timestampInput.classList.add('invalid');
-      timestampInput.classList.remove('valid');
-      
-      const errorElement = document.querySelector('[data-field="Timestamp"]');
-      if (errorElement) {
-        errorElement.textContent = lockCheck.message;
-        errorElement.classList.add('show');
+      showWarning: function(message) {
+        document.getElementById('monthLockMessage').textContent = message;
+        document.getElementById('monthLockWarning').style.display = 'block';
       }
-      
-      this.showWarning(lockCheck.message);
-      return false;
-    } else {
-      timestampInput.classList.remove('invalid');
-      const errorElement = document.querySelector('[data-field="Timestamp"]');
-      if (errorElement) {
-        errorElement.classList.remove('show');
-      }
-      return true;
-    }
-  },
+    };
 
     // ============ ADMIN MESSAGE SYSTEM ============
     
@@ -1930,21 +1893,11 @@
       const formData = new FormData(form);
 
       // Format timestamp
-     const rawTimestamp = formData.get("Timestamp");
-if (rawTimestamp) {
-  // CHECK MONTH LOCK SEBELUM SUBMIT
-  const lockCheck = MonthLockSystem.checkMonthLock(rawTimestamp);
-  if (lockCheck.locked) {
-    MonthLockSystem.showWarning(lockCheck.message);
-    submitButton.disabled = false;
-    return; // Stop submission
-  }
-  
-  // Format timestamp jika tidak terkunci
-  const dt = new Date(rawTimestamp);
-  const formatted = `${dt.getMonth() + 1}/${dt.getDate()}/${dt.getFullYear()} ${String(dt.getHours()).padStart(2, '0')}:${String(dt.getMinutes()).padStart(2, '0')}:00`;
-  formData.set("Timestamp", formatted);
-}
+      const rawTimestamp = formData.get("Timestamp");
+      if (rawTimestamp) {
+        const dt = new Date(rawTimestamp);
+        const formatted = `${dt.getMonth() + 1}/${dt.getDate()}/${dt.getFullYear()} ${String(dt.getHours()).padStart(2, '0')}:${String(dt.getMinutes()).padStart(2, '0')}:00`;
+        formData.set("Timestamp", formatted);
         
         // Check month lock
         const lockCheck = await MonthLockSystem.checkMonthLock(rawTimestamp);
@@ -2071,36 +2024,40 @@ if (rawTimestamp) {
 
     // ============ BROADCAST CHANNEL COMMUNICATION ============
     
-    listenForAdminUpdates: function() {
+    // Listen for admin updates
     if (typeof BroadcastChannel !== 'undefined') {
       const channel = new BroadcastChannel('ltt_admin_updates');
       
       channel.addEventListener('message', (event) => {
         const { type, data } = event.data;
         
-        if (type === 'MONTH_LOCK_UPDATE') {
-          localStorage.setItem('ltt_month_lock_config', JSON.stringify(data.config));
-          
-          const timestampInput = document.querySelector('input[name="Timestamp"]');
-          if (timestampInput && timestampInput.value) {
-            this.validateTimestampInput(timestampInput);
-          }
-          
-          showToast('📅 Pengaturan kunci bulan telah diupdate oleh admin', true);
+        switch (type) {
+          case 'FORCE_LOGOUT':
+            if (currentSession && currentSession.userCode === data.userId) {
+              showToast('❌ Anda telah di-logout oleh administrator', false);
+              setTimeout(() => AuthSystem.logout(), 2000);
+            }
+            break;
+            
+          case 'FORCE_LOGOUT_ALL':
+            showToast('❌ Semua user telah di-logout oleh administrator', false);
+            setTimeout(() => AuthSystem.logout(), 2000);
+            break;
+            
+          case 'MONTH_LOCK_UPDATE':
+            // Month lock settings updated
+            break;
+            
+          case 'SESSION_SETTINGS_UPDATE':
+            // Session settings updated
+            break;
+            
+          case 'ADMIN_MESSAGE':
+            AdminMessageSystem.showMessage(data.message);
+            break;
         }
       });
     }
-    
-    window.addEventListener('storage', (e) => {
-      if (e.key === 'ltt_month_lock_config') {
-        const timestampInput = document.querySelector('input[name="Timestamp"]');
-        if (timestampInput && timestampInput.value) {
-          this.validateTimestampInput(timestampInput);
-        }
-      }
-    });
-  }
-};
 
     // ============ UTILITY FUNCTIONS ============
     
@@ -2142,9 +2099,7 @@ if (rawTimestamp) {
       
       // Setup form validation
       FormValidator.setupRealTimeValidation(document.getElementById('monitoringForm'));
-MonthLockSystem.setupTimestampValidation();
-MonthLockSystem.listenForAdminUpdates();
-          
+      
       // Start session monitoring
       startSessionMonitoring();
       
