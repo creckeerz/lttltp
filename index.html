@@ -154,6 +154,36 @@
       border-radius: 8px;
       font-size: 15px;
       box-sizing: border-box;
+      transition: border-color 0.3s ease;
+    }
+
+    /* Input validation styles */
+    .sw-container input.invalid, .sw-container select.invalid {
+      border-color: #e74c3c;
+      background-color: #fdf2f2;
+    }
+
+    .sw-container input.valid, .sw-container select.valid {
+      border-color: #2ecc71;
+      background-color: #f8fff8;
+    }
+
+    .field-error {
+      color: #e74c3c;
+      font-size: 12px;
+      margin-top: 4px;
+      display: none;
+      font-weight: 500;
+    }
+
+    .field-error.show {
+      display: block;
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-5px); }
+      to { opacity: 1; transform: translateY(0); }
     }
 
     button.sw-btn {
@@ -215,6 +245,42 @@
     .controls button {
       font-size: 14px;
       padding: 8px 16px;
+    }
+
+    /* Validation summary */
+    .validation-summary {
+      background: #fdf2f2;
+      border: 1px solid #e74c3c;
+      border-radius: 8px;
+      padding: 15px;
+      margin: 20px 0;
+      display: none;
+    }
+
+    .validation-summary.show {
+      display: block;
+      animation: slideDown 0.3s ease;
+    }
+
+    @keyframes slideDown {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .validation-summary h4 {
+      color: #e74c3c;
+      margin: 0 0 10px 0;
+      font-size: 16px;
+    }
+
+    .validation-summary ul {
+      margin: 0;
+      padding-left: 20px;
+      color: #c0392b;
+    }
+
+    .validation-summary li {
+      margin-bottom: 5px;
     }
 
     /* Offline Status Indicator */
@@ -676,6 +742,12 @@
       💾 Data form disimpan otomatis setiap perubahan
     </div>
 
+    <!-- Validation Summary -->
+    <div id="validationSummary" class="validation-summary">
+      <h4>⚠️ Harap lengkapi field berikut:</h4>
+      <ul id="validationList"></ul>
+    </div>
+
     <form id="monitoringForm">
       <div id="smartwizard">
         <ul class="nav">
@@ -690,6 +762,7 @@
   <div id="step-1" class="tab-pane" role="tabpanel">
     <label>Timestamp <span style="color: red;">*</span></label>
     <input type="datetime-local" name="Timestamp" required />
+    <div class="field-error" data-field="Timestamp">Field Timestamp harus diisi</div>
     
     <label>Periode Monitoring <span style="color: red;">*</span></label>
     <select name="Periode Monitoring" required>
@@ -700,82 +773,104 @@
       <option value="Minggu ke 4">Minggu ke 4</option>
       <option value="Minggu ke 5">Minggu ke 5</option>
     </select>
+    <div class="field-error" data-field="Periode Monitoring">Field Periode Monitoring harus dipilih</div>
 
     <label>Nama Penyuluh <span style="color: red;">*</span></label>
     <input type="text" name="nama" id="formPenyuluhName" readonly style="background: #f8f9fa;" required />
+    <div class="field-error" data-field="nama">Field Nama Penyuluh harus diisi</div>
 
     <label>Kecamatan <span style="color: red;">*</span></label>
     <select name="Kecamatan" id="kecamatanSelect" required>
       <option value="">-- Pilih Kecamatan --</option>
     </select>
+    <div class="field-error" data-field="Kecamatan">Field Kecamatan harus dipilih</div>
     
     <label>Desa <span style="color: red;">*</span></label>
     <select name="Desa" id="desaSelect" required>
       <option value="">-- Pilih Desa --</option>
     </select>
+    <div class="field-error" data-field="Desa">Field Desa harus dipilih</div>
   </div>
 
   <!-- STEP 2 - DATA LTT -->
   <div id="step-2" class="tab-pane" role="tabpanel">
     <label>Luas Baku Sawah (LBS) <span style="color: red;">*</span></label>
     <input type="number" name="Luas Baku Sawah (LBS)" step="0.01" min="0" required />
+    <div class="field-error" data-field="Luas Baku Sawah (LBS)">Field Luas Baku Sawah (LBS) harus diisi dengan angka</div>
     
     <label>Luas Tanam Tahun Sebelumnya (Ha) <span style="color: red;">*</span></label>
     <input type="number" name="Luas Tanam Tahun Sebelumnya (Ha)" step="0.01" min="0" required />
+    <div class="field-error" data-field="Luas Tanam Tahun Sebelumnya (Ha)">Field Luas Tanam Tahun Sebelumnya harus diisi dengan angka</div>
     
     <label>IP Existing <span style="color: red;">*</span></label>
     <input type="text" name="IP Existing" placeholder="Contoh: IP 200" required />
+    <div class="field-error" data-field="IP Existing">Field IP Existing harus diisi</div>
     
     <label>LTT Padi Reguler (Ha) <span style="color: red;">*</span></label>
     <input type="number" name="LTT Padi Reguler (Ha)" step="0.01" min="0" required />
+    <div class="field-error" data-field="LTT Padi Reguler (Ha)">Field LTT Padi Reguler harus diisi dengan angka</div>
     
     <label>LTT Padi Oplah (Ha) <span style="color: red;">*</span></label>
     <input type="number" name="LTT Padi Oplah (Ha)" step="0.01" min="0" required />
+    <div class="field-error" data-field="LTT Padi Oplah (Ha)">Field LTT Padi Oplah harus diisi dengan angka</div>
     
     <label>LTT Padi Irigasi Pompa (Ha) <span style="color: red;">*</span></label>
     <input type="number" name="LTT Padi Irigasi Pompa (Ha)" step="0.01" min="0" required />
+    <div class="field-error" data-field="LTT Padi Irigasi Pompa (Ha)">Field LTT Padi Irigasi Pompa harus diisi dengan angka</div>
     
     <label>LTT Padi Gogo / Lahan Kering (Ha) <span style="color: red;">*</span></label>
     <input type="number" name="LTT Padi Gogo / Lahan Kering" step="0.01" min="0" required />
+    <div class="field-error" data-field="LTT Padi Gogo / Lahan Kering">Field LTT Padi Gogo / Lahan Kering harus diisi dengan angka</div>
   </div>
 
   <!-- STEP 3 - DATA LTP -->
   <div id="step-3" class="tab-pane" role="tabpanel">
     <label>LTP Padi Reguler (Ha) <span style="color: red;">*</span></label>
     <input type="number" name="LTP Padi Reguler (Ha)" step="0.01" min="0" required />
+    <div class="field-error" data-field="LTP Padi Reguler (Ha)">Field LTP Padi Reguler harus diisi dengan angka</div>
     
     <label>Produktivitas Padi Reguler (Ku/Ha) <span style="color: red;">*</span></label>
     <input type="number" name="Provitas Padi Reguler (Ku/Ha)" step="0.01" min="0" required />
+    <div class="field-error" data-field="Provitas Padi Reguler (Ku/Ha)">Field Produktivitas Padi Reguler harus diisi dengan angka</div>
     
     <label>LTP Padi Oplah (Ha) <span style="color: red;">*</span></label>
     <input type="number" name="LTP Padi Oplah (Ha)" step="0.01" min="0" required />
+    <div class="field-error" data-field="LTP Padi Oplah (Ha)">Field LTP Padi Oplah harus diisi dengan angka</div>
     
     <label>Produktivitas Padi Oplah (Ku/Ha) <span style="color: red;">*</span></label>
     <input type="number" name="Provitas Padi Oplah (Ku/Ha)" step="0.01" min="0" required />
+    <div class="field-error" data-field="Provitas Padi Oplah (Ku/Ha)">Field Produktivitas Padi Oplah harus diisi dengan angka</div>
     
     <label>LTP Padi Irigasi Pompa (Ha) <span style="color: red;">*</span></label>
     <input type="number" name="LTP Padi Irigasi Pompa (Ha)" step="0.01" min="0" required />
+    <div class="field-error" data-field="LTP Padi Irigasi Pompa (Ha)">Field LTP Padi Irigasi Pompa harus diisi dengan angka</div>
     
     <label>Produktivitas Padi Irigasi Pompa (Ku/Ha) <span style="color: red;">*</span></label>
     <input type="number" name="Provitas Padi irigasi Pompa (Ku/Ha)" step="0.01" min="0" required />
+    <div class="field-error" data-field="Provitas Padi irigasi Pompa (Ku/Ha)">Field Produktivitas Padi Irigasi Pompa harus diisi dengan angka</div>
     
     <label>LTP Padi Gogo / Lahan Kering (Ha) <span style="color: red;">*</span></label>
     <input type="number" name="LTP Padi Gogo / Lahan Kering" step="0.01" min="0" required />
+    <div class="field-error" data-field="LTP Padi Gogo / Lahan Kering">Field LTP Padi Gogo / Lahan Kering harus diisi dengan angka</div>
     
     <label>Produktivitas Padi Gogo (Ku/Ha) <span style="color: red;">*</span></label>
     <input type="number" name="Provitas Padi Gogo (Ku/Ha)" step="0.01" min="0" required />
+    <div class="field-error" data-field="Provitas Padi Gogo (Ku/Ha)">Field Produktivitas Padi Gogo harus diisi dengan angka</div>
   </div>
 
   <!-- STEP 4 - JAGUNG & SUBMIT -->
   <div id="step-4" class="tab-pane" role="tabpanel">
     <label>LTT Jagung (Ha) <span style="color: red;">*</span></label>
     <input type="number" name="LTT Jagung (Ha)" step="0.01" min="0" required />
+    <div class="field-error" data-field="LTT Jagung (Ha)">Field LTT Jagung harus diisi dengan angka</div>
     
     <label>LTP Jagung (Ha) <span style="color: red;">*</span></label>
     <input type="number" name="LTP Jagung (Ha)" step="0.01" min="0" required />
+    <div class="field-error" data-field="LTP Jagung (Ha)">Field LTP Jagung harus diisi dengan angka</div>
     
     <label>Produktivitas Jagung (Ku/Ha) <span style="color: red;">*</span></label>
     <input type="number" name="Provitas Jagung (Ku/Ha)" step="0.01" min="0" required />
+    <div class="field-error" data-field="Provitas Jagung (Ku/Ha)">Field Produktivitas Jagung harus diisi dengan angka</div>
     
     <div style="margin-top: 30px; padding: 20px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #2ecc71;">
       <h4 style="color: #2c3e50; margin-bottom: 10px;">📋 Ringkasan Pengisian</h4>
@@ -788,6 +883,7 @@
           Saya telah memeriksa dan memastikan semua data sudah benar <span style="color: red;">*</span>
         </label>
       </div>
+      <div class="field-error" data-field="confirmData">Anda harus mencentang konfirmasi ini sebelum mengirim data</div>
     </div>
     
     <button type="submit" style="
@@ -808,6 +904,8 @@
     </button>
   </div>
 </div>
+</form>
+    </div>
 
   <!-- Table & Control -->
   <div class="controls">
@@ -891,6 +989,185 @@
       "LTP Jagung (Ha)", "Provitas Jagung (Ku/Ha)", "Luas Baku Sawah (LBS)",
       "IP Existing", "Luas Tanam Tahun Sebelumnya (Ha)", "Provitas Padi Gogo (Ku/Ha)"
     ];
+
+    // ============ FORM VALIDATION SYSTEM ============
+    
+    const FormValidator = {
+      // Validate single field
+      validateField: function(field) {
+        const value = field.value.trim();
+        const fieldName = field.name;
+        const isRequired = field.hasAttribute('required');
+        const fieldType = field.type;
+        const errorElement = document.querySelector(`[data-field="${fieldName}"]`);
+        
+        let isValid = true;
+        let errorMessage = '';
+        
+        if (isRequired && !value) {
+          isValid = false;
+          errorMessage = this.getFieldDisplayName(fieldName) + ' harus diisi';
+        } else if (value && fieldType === 'number') {
+          const numValue = parseFloat(value);
+          if (isNaN(numValue) || numValue < 0) {
+            isValid = false;
+            errorMessage = this.getFieldDisplayName(fieldName) + ' harus berupa angka positif';
+          }
+        } else if (fieldName === 'confirmData' && field.type === 'checkbox' && !field.checked) {
+          isValid = false;
+          errorMessage = 'Anda harus mencentang konfirmasi ini sebelum mengirim data';
+        }
+        
+        // Update field visual state
+        if (isValid) {
+          field.classList.remove('invalid');
+          field.classList.add('valid');
+          if (errorElement) {
+            errorElement.classList.remove('show');
+          }
+        } else {
+          field.classList.remove('valid');
+          field.classList.add('invalid');
+          if (errorElement) {
+            errorElement.textContent = errorMessage;
+            errorElement.classList.add('show');
+          }
+        }
+        
+        return { isValid, errorMessage, fieldName };
+      },
+      
+      // Validate entire form
+      validateForm: function(form) {
+        const fields = form.querySelectorAll('input[required], select[required], #confirmData');
+        const errors = [];
+        let firstInvalidField = null;
+        
+        // Clear previous validation summary
+        this.hideValidationSummary();
+        
+        // Validate each field
+        fields.forEach(field => {
+          const result = this.validateField(field);
+          if (!result.isValid) {
+            errors.push(result);
+            if (!firstInvalidField) {
+              firstInvalidField = field;
+            }
+          }
+        });
+        
+        // Show validation summary if there are errors
+        if (errors.length > 0) {
+          this.showValidationSummary(errors);
+          
+          // Scroll to first invalid field
+          if (firstInvalidField) {
+            firstInvalidField.scrollIntoView({ 
+              behavior: 'smooth', 
+              block: 'center' 
+            });
+            firstInvalidField.focus();
+          }
+        }
+        
+        return errors.length === 0;
+      },
+      
+      // Show validation summary
+      showValidationSummary: function(errors) {
+        const summaryElement = document.getElementById('validationSummary');
+        const listElement = document.getElementById('validationList');
+        
+        listElement.innerHTML = '';
+        errors.forEach(error => {
+          const li = document.createElement('li');
+          li.textContent = error.errorMessage;
+          listElement.appendChild(li);
+        });
+        
+        summaryElement.classList.add('show');
+        summaryElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      },
+      
+      // Hide validation summary
+      hideValidationSummary: function() {
+        const summaryElement = document.getElementById('validationSummary');
+        summaryElement.classList.remove('show');
+      },
+      
+      // Get user-friendly field name
+      getFieldDisplayName: function(fieldName) {
+        const displayNames = {
+          'Timestamp': 'Timestamp',
+          'Periode Monitoring': 'Periode Monitoring',
+          'nama': 'Nama Penyuluh',
+          'Kecamatan': 'Kecamatan',
+          'Desa': 'Desa',
+          'Luas Baku Sawah (LBS)': 'Luas Baku Sawah (LBS)',
+          'Luas Tanam Tahun Sebelumnya (Ha)': 'Luas Tanam Tahun Sebelumnya',
+          'IP Existing': 'IP Existing',
+          'LTT Padi Reguler (Ha)': 'LTT Padi Reguler',
+          'LTT Padi Oplah (Ha)': 'LTT Padi Oplah',
+          'LTT Padi Irigasi Pompa (Ha)': 'LTT Padi Irigasi Pompa',
+          'LTT Padi Gogo / Lahan Kering': 'LTT Padi Gogo / Lahan Kering',
+          'LTP Padi Reguler (Ha)': 'LTP Padi Reguler',
+          'Provitas Padi Reguler (Ku/Ha)': 'Produktivitas Padi Reguler',
+          'LTP Padi Oplah (Ha)': 'LTP Padi Oplah',
+          'Provitas Padi Oplah (Ku/Ha)': 'Produktivitas Padi Oplah',
+          'LTP Padi Irigasi Pompa (Ha)': 'LTP Padi Irigasi Pompa',
+          'Provitas Padi irigasi Pompa (Ku/Ha)': 'Produktivitas Padi Irigasi Pompa',
+          'LTP Padi Gogo / Lahan Kering': 'LTP Padi Gogo / Lahan Kering',
+          'Provitas Padi Gogo (Ku/Ha)': 'Produktivitas Padi Gogo',
+          'LTT Jagung (Ha)': 'LTT Jagung',
+          'LTP Jagung (Ha)': 'LTP Jagung',
+          'Provitas Jagung (Ku/Ha)': 'Produktivitas Jagung',
+          'confirmData': 'Konfirmasi data'
+        };
+        
+        return displayNames[fieldName] || fieldName;
+      },
+      
+      // Setup real-time validation
+      setupRealTimeValidation: function(form) {
+        const fields = form.querySelectorAll('input, select');
+        
+        fields.forEach(field => {
+          // Validate on blur
+          field.addEventListener('blur', () => {
+            if (field.value.trim() || field.hasAttribute('required')) {
+              this.validateField(field);
+            }
+          });
+          
+          // Clear error on input
+          field.addEventListener('input', () => {
+            if (field.classList.contains('invalid')) {
+              // Re-validate after a short delay
+              setTimeout(() => {
+                this.validateField(field);
+              }, 500);
+            }
+            
+            // Hide validation summary when user starts correcting
+            this.hideValidationSummary();
+          });
+          
+          // Special handling for select fields
+          field.addEventListener('change', () => {
+            this.validateField(field);
+          });
+        });
+        
+        // Special handling for checkbox
+        const confirmCheckbox = document.getElementById('confirmData');
+        if (confirmCheckbox) {
+          confirmCheckbox.addEventListener('change', () => {
+            this.validateField(confirmCheckbox);
+          });
+        }
+      }
+    };
 
     // ============ AUTHENTICATION SYSTEM ============
     
@@ -1594,7 +1871,7 @@
 
     // ============ FORM SUBMISSION ============
 
-    // Form submission dengan offline support dan auth check
+    // Form submission dengan validasi, offline support dan auth check
     document.getElementById("monitoringForm").addEventListener('submit', async e => {
       e.preventDefault();
       
@@ -1606,6 +1883,13 @@
 
       const form = e.target;
       const submitButton = form.querySelector("button[type='submit']");
+      
+      // Validate form first
+      if (!FormValidator.validateForm(form)) {
+        showToast('❌ Harap lengkapi semua field yang diperlukan', false);
+        return;
+      }
+
       const formData = new FormData(form);
 
       // Format timestamp
@@ -1637,6 +1921,7 @@
         const submissionId = saveSubmissionToQueue(formData);
         showToast("📱 Offline: Data disimpan lokal dan akan dikirim otomatis saat online", true);
         form.reset();
+        FormValidator.hideValidationSummary();
         localStorage.removeItem('ltt_form_data');
         updateUserInfo(); // Restore user info after form reset
         submitButton.disabled = false;
@@ -1657,6 +1942,7 @@
         if (result.success) {
           showToast("✅ Data berhasil dikirim", true);
           form.reset();
+          FormValidator.hideValidationSummary();
           localStorage.removeItem('ltt_form_data');
           updateUserInfo(); // Restore user info after form reset
           loadData();
@@ -1669,6 +1955,7 @@
         const submissionId = saveSubmissionToQueue(formData);
         showToast("⚠️ Koneksi bermasalah. Data disimpan lokal dan akan dikirim otomatis saat koneksi stabil", false);
         form.reset();
+        FormValidator.hideValidationSummary();
         localStorage.removeItem('ltt_form_data');
         updateUserInfo(); // Restore user info after form reset
       } finally {
@@ -1809,6 +2096,9 @@
       // Setup offline functionality
       updateConnectionStatus();
       setupAutoSave();
+      
+      // Setup form validation
+      FormValidator.setupRealTimeValidation(document.getElementById('monitoringForm'));
       
       // Start session monitoring
       startSessionMonitoring();
@@ -1952,6 +2242,7 @@
     window.AuthSystem = AuthSystem;
     window.MonthLockSystem = MonthLockSystem;
     window.AdminMessageSystem = AdminMessageSystem;
+    window.FormValidator = FormValidator;
   </script>
 </body>
 </html>
