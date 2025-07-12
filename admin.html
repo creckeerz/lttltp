@@ -882,121 +882,131 @@
     }
 
     function updateLockStatusDisplay() {
-      const display = document.getElementById('lockStatusDisplay');
-      const toggleBtn = document.getElementById('lockToggleText');
-      
-      if (currentConfig.monthLock.enabled) {
-        const monthNames = ['', 'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 
-                           'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
-        
-        display.innerHTML = `
-          <span class="lock-icon locked">🔒</span>
-          <span class="locked">Terkunci: ${monthNames[currentConfig.monthLock.month]} ${currentConfig.monthLock.year}</span>
-        `;
-        toggleBtn.textContent = 'Buka Kunci';
-      } else {
-        display.innerHTML = `
-          <span class="lock-icon unlocked">🔓</span>
-          <span class="unlocked">Tidak ada kunci aktif</span>
-        `;
-        toggleBtn.textContent = 'Aktifkan Kunci';
-      }
+  const display = document.getElementById('lockStatusDisplay');
+  const toggleBtn = document.getElementById('lockToggleText');
+  
+  if (currentConfig.monthLock.enabled) {
+    const monthNames = ['', 'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 
+                       'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+    
+    display.innerHTML = `
+      <span class="lock-icon locked">🔒</span>
+      <span class="locked">Terkunci: ${monthNames[currentConfig.monthLock.month]} ${currentConfig.monthLock.year}</span>
+    `;
+    toggleBtn.textContent = 'Buka Kunci';
+    
+  } else {
+    display.innerHTML = `
+      <span class="lock-icon unlocked">🔓</span>
+      <span class="unlocked">Tidak ada kunci aktif - Semua bulan dapat diinput</span>
+    `;
+    toggleBtn.textContent = 'Aktifkan Kunci';
+  }
       
       // Update form values
-      document.getElementById('lockedMonth').value = currentConfig.monthLock.month || '';
-      document.getElementById('lockedYear').value = currentConfig.monthLock.year || new Date().getFullYear();
-      document.getElementById('lockMessage').value = currentConfig.monthLock.message || '';
-      
-      // Broadcast config to all user tabs
-      broadcastConfigUpdate();
-    }
+  document.getElementById('lockedMonth').value = currentConfig.monthLock.month || '';
+  document.getElementById('lockedYear').value = currentConfig.monthLock.year || new Date().getFullYear();
+  document.getElementById('lockMessage').value = currentConfig.monthLock.message || '';
+  
+  // Broadcast config to all user tabs
+  broadcastConfigUpdate();
+}
 
     async function setMonthLock() {
-      const month = document.getElementById('lockedMonth').value;
-      const year = document.getElementById('lockedYear').value;
-      const message = document.getElementById('lockMessage').value;
+  const month = document.getElementById('lockedMonth').value;
+  const year = document.getElementById('lockedYear').value;
+  const message = document.getElementById('lockMessage').value;
+  
+  if (!month || !year) {
+    showAlert('Pilih bulan dan tahun terlebih dahulu', 'error');
+    return;
+  }
       
-      if (!month || !year) {
-        showAlert('Pilih bulan dan tahun terlebih dahulu', 'error');
-        return;
-      }
-      
-      // Update local config immediately
-      currentConfig.monthLock = {
-        enabled: true,
-        month: parseInt(month),
-        year: parseInt(year),
-        message: message
-      };
-      
-      saveConfigLocally(currentConfig);
-      updateLockStatusDisplay();
-      
-      try {
-        // Try to sync with server
-        const formData = new FormData();
-        formData.append('action', 'set_config');
-        formData.append('session_id', currentAdminSession.sessionId);
-        formData.append('config_type', 'month_lock');
-        formData.append('enabled', 'true');
-        formData.append('month', month);
-        formData.append('year', year);
-        formData.append('message', message);
+     / Update local config immediately
+  currentConfig.monthLock = {
+    enabled: true,
+    month: parseInt(month),
+    year: parseInt(year),
+    message: message || `Input untuk bulan ${getMonthName(month)} ${year} telah dikunci oleh administrator.`
+  };
+  
+  saveConfigLocally(currentConfig);
+  updateLockStatusDisplay();
+  
+  // Broadcast ke semua user tabs
+  broadcastConfigUpdate();
+  
+  try {
+    // Try to sync with server
+    const formData = new FormData();
+    formData.append('action', 'set_config');
+    formData.append('session_id', currentAdminSession.sessionId);
+    formData.append('config_type', 'month_lock');
+    formData.append('enabled', 'true');
+    formData.append('month', month);
+    formData.append('year', year);
+    formData.append('message', message);
         
         const response = await fetch(CONFIG.scriptURL, {
-          method: 'POST',
-          body: formData
-        });
-        
-        const result = await response.json();
-        
-        if (result.success) {
-          showAlert(`Kunci bulan ${getMonthName(month)} ${year} berhasil diaktifkan dan disimpan ke server`, 'success');
-        } else {
-          showAlert(`Kunci bulan berhasil diaktifkan secara lokal. Error server: ${result.error}`, 'warning');
-        }
-      } catch (error) {
-        showAlert(`Kunci bulan berhasil diaktifkan secara lokal. Koneksi server bermasalah: ${error.message}`, 'warning');
-      }
+      method: 'POST',
+      body: formData
+    });
+    
+    const result = await response.json();
+    
+    if (result.success) {
+      showAlert(`🔒 Kunci bulan ${getMonthName(month)} ${year} berhasil diaktifkan dan disimpan ke server`, 'success');
+    } else {
+      showAlert(`🔒 Kunci bulan berhasil diaktifkan secara lokal. Error server: ${result.error}`, 'warning');
     }
+  } catch (error) {
+    showAlert(`🔒 Kunci bulan berhasil diaktifkan secara lokal. Koneksi server bermasalah: ${error.message}`, 'warning');
+  }
+}
 
     async function toggleMonthLock() {
-      const newEnabled = !currentConfig.monthLock.enabled;
-      
-      // Update local config immediately
-      currentConfig.monthLock.enabled = newEnabled;
-      saveConfigLocally(currentConfig);
-      updateLockStatusDisplay();
-      
-      try {
-        // Try to sync with server
-        const formData = new FormData();
-        formData.append('action', 'set_config');
-        formData.append('session_id', currentAdminSession.sessionId);
-        formData.append('config_type', 'month_lock');
-        formData.append('enabled', newEnabled.toString());
-        formData.append('month', currentConfig.monthLock.month || '');
-        formData.append('year', currentConfig.monthLock.year || '');
-        formData.append('message', currentConfig.monthLock.message || '');
-        
-        const response = await fetch(CONFIG.scriptURL, {
-          method: 'POST',
-          body: formData
-        });
+  const newEnabled = !currentConfig.monthLock.enabled;
+  
+  // Update local config immediately
+  currentConfig.monthLock.enabled = newEnabled;
+  saveConfigLocally(currentConfig);
+  updateLockStatusDisplay();
+  
+  // Broadcast ke semua user tabs
+  broadcastConfigUpdate();
+  
+  try {
+    // Try to sync with server
+    const formData = new FormData();
+    formData.append('action', 'set_config');
+    formData.append('session_id', currentAdminSession.sessionId);
+    formData.append('config_type', 'month_lock');
+    formData.append('enabled', newEnabled.toString());
+    formData.append('month', currentConfig.monthLock.month || '');
+    formData.append('year', currentConfig.monthLock.year || '');
+    formData.append('message', currentConfig.monthLock.message || '');
+    
+    const response = await fetch(CONFIG.scriptURL, {
+      method: 'POST',
+      body: formData
+    });
         
         const result = await response.json();
-        
-        const status = newEnabled ? 'diaktifkan' : 'dinonaktifkan';
-        if (result.success) {
-          showAlert(`Kunci bulan berhasil ${status} dan disimpan ke server`, 'success');
-        } else {
-          showAlert(`Kunci bulan berhasil ${status} secara lokal. Error server: ${result.error}`, 'warning');
-        }
-      } catch (error) {
-        const status = newEnabled ? 'diaktifkan' : 'dinonaktifkan';
-        showAlert(`Kunci bulan berhasil ${status} secara lokal. Koneksi server bermasalah: ${error.message}`, 'warning');
-      }
+    
+    const status = newEnabled ? 'diaktifkan' : 'dinonaktifkan';
+    const icon = newEnabled ? '🔒' : '🔓';
+    
+    if (result.success) {
+      showAlert(`${icon} Kunci bulan berhasil ${status} dan disimpan ke server`, 'success');
+    } else {
+      showAlert(`${icon} Kunci bulan berhasil ${status} secara lokal. Error server: ${result.error}`, 'warning');
     }
+  } catch (error) {
+    const status = newEnabled ? 'diaktifkan' : 'dinonaktifkan';
+    const icon = newEnabled ? '🔒' : '🔓';
+    showAlert(`${icon} Kunci bulan berhasil ${status} secara lokal. Koneksi server bermasalah: ${error.message}`, 'warning');
+  }
+}
 
     function getMonthName(monthNum) {
       const months = ['', 'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 
@@ -1034,20 +1044,24 @@
 
     function broadcastConfigUpdate() {
       // Broadcast config update to all user tabs
-      if (typeof BroadcastChannel !== 'undefined') {
-        const channel = new BroadcastChannel('ltt_admin_updates');
-        channel.postMessage({
-          type: 'MONTH_LOCK_UPDATE',
-          data: { 
-            config: currentConfig.monthLock,
-            timestamp: Date.now()
-          }
-        });
+  if (typeof BroadcastChannel !== 'undefined') {
+    const channel = new BroadcastChannel('ltt_admin_updates');
+    channel.postMessage({
+      type: 'MONTH_LOCK_UPDATE',
+      data: { 
+        config: currentConfig.monthLock,
+        timestamp: Date.now()
       }
+    });
+    console.log('Month lock config broadcasted to all user tabs');
+  }
       
-      // Also save to a shared storage that index.html can read
-      localStorage.setItem('ltt_month_lock_config', JSON.stringify(currentConfig.monthLock));
-    }
+     // Save to localStorage yang akan dibaca oleh index.html
+  localStorage.setItem('ltt_month_lock_config', JSON.stringify(currentConfig.monthLock));
+  
+  // Log untuk debugging
+  console.log('Month lock config saved to localStorage:', currentConfig.monthLock);
+}
 
     // ============ USER SESSION MANAGEMENT ============
     
