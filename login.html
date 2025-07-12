@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Login - Form Monitoring LTT & LTP</title>
+  <title>Admin Login - Form Monitoring LTT & LTP</title>
   <style>
     * {
       margin: 0;
@@ -16,40 +16,28 @@
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       min-height: 100vh;
       display: flex;
-      align-items: center;
       justify-content: center;
+      align-items: center;
       padding: 20px;
     }
 
     .login-container {
       background: white;
+      padding: 50px;
       border-radius: 20px;
       box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-      padding: 40px;
-      width: 100%;
       max-width: 450px;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .login-container::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 5px;
-      background: linear-gradient(90deg, #3498db, #2ecc71, #f39c12, #e74c3c);
+      width: 100%;
+      text-align: center;
     }
 
     .login-header {
-      text-align: center;
       margin-bottom: 40px;
     }
 
     .login-header h1 {
       color: #2c3e50;
-      font-size: 28px;
+      font-size: 32px;
       margin-bottom: 10px;
     }
 
@@ -68,7 +56,7 @@
 
     .tab-btn {
       flex: 1;
-      padding: 12px;
+      padding: 12px 20px;
       background: transparent;
       border: none;
       border-radius: 8px;
@@ -82,7 +70,7 @@
     .tab-btn.active {
       background: #3498db;
       color: white;
-      box-shadow: 0 2px 10px rgba(52, 152, 219, 0.3);
+      box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
     }
 
     .login-form {
@@ -95,6 +83,7 @@
 
     .form-group {
       margin-bottom: 25px;
+      text-align: left;
     }
 
     .form-group label {
@@ -111,73 +100,107 @@
       border: 2px solid #e1e8ed;
       border-radius: 10px;
       font-size: 16px;
-      transition: all 0.3s ease;
-      background: #f8f9fa;
+      transition: border-color 0.3s ease;
     }
 
     .form-group input:focus,
     .form-group select:focus {
       outline: none;
       border-color: #3498db;
-      background: white;
-      box-shadow: 0 0 0 4px rgba(52, 152, 219, 0.1);
-    }
-
-    .form-group input.error {
-      border-color: #e74c3c;
-      animation: shake 0.5s ease-in-out;
-    }
-
-    @keyframes shake {
-      0%, 100% { transform: translateX(0); }
-      25% { transform: translateX(-5px); }
-      75% { transform: translateX(5px); }
+      box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
     }
 
     .login-btn {
       width: 100%;
-      padding: 15px;
+      padding: 18px;
       background: linear-gradient(135deg, #3498db, #2980b9);
       color: white;
       border: none;
       border-radius: 10px;
-      font-size: 16px;
+      font-size: 18px;
       font-weight: 600;
       cursor: pointer;
-      transition: all 0.3s ease;
-      position: relative;
-      overflow: hidden;
+      transition: transform 0.3s ease;
+      margin-bottom: 20px;
     }
 
     .login-btn:hover {
       transform: translateY(-2px);
-      box-shadow: 0 10px 25px rgba(52, 152, 219, 0.3);
-    }
-
-    .login-btn:active {
-      transform: translateY(0);
     }
 
     .login-btn:disabled {
-      background: #bdc3c7;
+      background: #95a5a6;
       cursor: not-allowed;
       transform: none;
-      box-shadow: none;
     }
 
-    .login-btn .spinner {
+    .admin-btn {
+      background: linear-gradient(135deg, #e74c3c, #c0392b);
+    }
+
+    .login-error {
+      background: #e74c3c;
+      color: white;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
       display: none;
-      width: 20px;
-      height: 20px;
-      border: 2px solid transparent;
-      border-top: 2px solid white;
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-      margin-right: 10px;
     }
 
-    .login-btn.loading .spinner {
-      display: inline-block;
+    .login-success {
+      background: #2ecc71;
+      color: white;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      display: none;
+    }
+
+    .form-links {
+      margin-top: 25px;
+      color: #7f8c8d;
+      font-size: 14px;
+    }
+
+    .form-links a {
+      color: #3498db;
+      text-decoration: none;
+    }
+
+    .form-links a:hover {
+      text-decoration: underline;
+    }
+
+    .system-info {
+      background: #f8f9fa;
+      padding: 20px;
+      border-radius: 10px;
+      margin-top: 30px;
+      font-size: 12px;
+      color: #95a5a6;
+    }
+
+    .loading-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(255, 255, 255, 0.9);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 10000;
+    }
+
+    .spinner {
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #3498db;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      animation: spin 1s linear infinite;
+      margin-bottom: 20px;
     }
 
     @keyframes spin {
@@ -185,834 +208,311 @@
       100% { transform: rotate(360deg); }
     }
 
-    .error-message {
-      background: #ffeaea;
-      color: #e74c3c;
-      padding: 12px;
-      border-radius: 8px;
-      margin-bottom: 20px;
-      border-left: 4px solid #e74c3c;
-      display: none;
-    }
-
-    .success-message {
-      background: #eafaf1;
-      color: #27ae60;
-      padding: 12px;
-      border-radius: 8px;
-      margin-bottom: 20px;
-      border-left: 4px solid #27ae60;
-      display: none;
-    }
-
-    .forgot-password {
-      text-align: center;
-      margin-top: 20px;
-    }
-
-    .forgot-password a {
-      color: #3498db;
-      text-decoration: none;
-      font-size: 14px;
-    }
-
-    .forgot-password a:hover {
-      text-decoration: underline;
-    }
-
-    .login-info {
-      background: #f8f9fa;
-      border-radius: 10px;
-      padding: 20px;
-      margin-top: 30px;
-      text-align: center;
-      border: 1px dashed #bdc3c7;
-    }
-
-    .login-info h4 {
-      color: #2c3e50;
-      margin-bottom: 10px;
-    }
-
-    .login-info p {
-      color: #7f8c8d;
-      font-size: 14px;
-      line-height: 1.5;
-    }
-
-    .demo-codes {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      margin-top: 15px;
-    }
-
-    .demo-code {
-      background: white;
-      padding: 8px;
-      border-radius: 5px;
-      font-family: monospace;
-      font-size: 12px;
-      color: #2c3e50;
-      border: 1px solid #e1e8ed;
-    }
-
-    .attempts-warning {
-      background: #fff3cd;
-      color: #856404;
-      padding: 10px;
-      border-radius: 5px;
-      margin-bottom: 15px;
-      font-size: 14px;
-      display: none;
-    }
-
-    @media (max-width: 480px) {
+    @media (max-width: 768px) {
       .login-container {
         padding: 30px 20px;
-        margin: 10px;
+        margin: 20px;
       }
       
       .login-header h1 {
         font-size: 24px;
       }
-      
-      .demo-codes {
-        grid-template-columns: 1fr;
-      }
     }
   </style>
 </head>
 <body>
+  <div class="loading-overlay" id="loadingOverlay">
+    <div style="text-align: center;">
+      <div class="spinner"></div>
+      <h3>Memproses login...</h3>
+    </div>
+  </div>
+
   <div class="login-container">
     <div class="login-header">
-      <h1>🔐 Login System</h1>
+      <h1>🔐 Login Sistem</h1>
       <p>Form Monitoring LTT & LTP</p>
     </div>
 
-    <!-- Login Tabs -->
+    <!-- Tab Navigation -->
     <div class="login-tabs">
-      <button class="tab-btn active" onclick="switchTab('user')">👤 User Login</button>
-      <button class="tab-btn" onclick="switchTab('admin')">🛠️ Admin Login</button>
+      <button class="tab-btn active" onclick="switchTab('user')">👤 User</button>
+      <button class="tab-btn" onclick="switchTab('admin')">🛠️ Admin</button>
     </div>
-
-    <!-- Error/Success Messages -->
-    <div id="errorMessage" class="error-message"></div>
-    <div id="successMessage" class="success-message"></div>
-    <div id="attemptsWarning" class="attempts-warning"></div>
 
     <!-- User Login Form -->
-    <form id="userLoginForm" class="login-form active">
-      <div class="form-group">
-        <label for="accessCode">Kode Akses</label>
-        <input type="text" id="accessCode" placeholder="Masukkan kode akses Anda" required autocomplete="username">
+    <div id="userLoginForm" class="login-form active">
+      <div id="userError" class="login-error"></div>
+      <div id="userSuccess" class="login-success"></div>
+      
+      <form id="userForm">
+        <div class="form-group">
+          <label>Kode Akses User</label>
+          <input type="text" id="userAccessCode" placeholder="Masukkan kode akses user" required />
+        </div>
+        
+        <div class="form-group">
+          <label>Nama Penyuluh</label>
+          <select id="userPenyuluhName" required>
+            <option value="">-- Pilih Nama Penyuluh --</option>
+            <option>A.PURNAMA PUTRA</option>
+            <option>AAN PUJINURINSAN</option>
+            <option>ABDUL RAHMAN</option>
+            <option>AGUS SAIFUDDIN</option>
+            <option>AGUSMANTO</option>
+            <option>AHADI</option>
+            <option>ALMIZAN</option>
+            <option>ALWAN SASRUDIN</option>
+            <option>ANDI</option>
+            <option>ANDI WIHARDI</option>
+            <option>ANDI WILLIAM</option>
+            <option>ANTO SAPUTRA</option>
+            <option>ARAMIYA</option>
+            <option>BUDI SETIAWAN</option>
+            <option>DARMA IRAWAN</option>
+            <option>DARMADI</option>
+            <option>DARUSSALAM</option>
+            <option>DINO</option>
+            <option>DIYANTO</option>
+            <option>EDI WAHYUDI</option>
+            <option>EDWARDI</option>
+            <option>EKO SURYONO</option>
+            <option>ELYA KANDAU</option>
+            <option>EMELDA</option>
+            <option>ESPAHANI</option>
+            <option>FITRIANI</option>
+            <option>FREEADI</option>
+            <option>HENGKY KUSUMA INDRA</option>
+            <option>HERY PRAMONO</option>
+            <option>IBNU ROSIHAN</option>
+            <option>IMANSYAH</option>
+            <option>IRLAH</option>
+            <option>IWAN APRIANTO</option>
+            <option>JAKA SUBHAN</option>
+            <option>JAWARI</option>
+            <option>JAYA HARTO</option>
+            <option>JUANDA</option>
+            <option>JUANDI</option>
+            <option>JUMIATI</option>
+            <option>KAMRAN</option>
+            <option>KARNILA</option>
+            <option>K.BUDIMAN</option>
+            <option>LILI SINTA RUSTIKA</option>
+            <option>MARNI</option>
+            <option>MUHAMMAD IRHAMSYAH</option>
+            <option>MUHAMMAD SAHADI</option>
+            <option>MULYADI</option>
+            <option>MURNI HADI</option>
+            <option>MURNIATI</option>
+            <option>NAZRULLAH</option>
+            <option>NEVI ARYATI</option>
+            <option>NIRLAWATI</option>
+            <option>NINING MUSWANI</option>
+            <option>NOVI YANA</option>
+            <option>NURLENA</option>
+            <option>NURHAYATI</option>
+            <option>NUR LAILA SARI</option>
+            <option>RAKHMAD BURHAN</option>
+            <option>RENA</option>
+            <option>RIAN PRASOJO</option>
+            <option>RIZA NOVINA</option>
+            <option>ROMI</option>
+            <option>RONA NURBAYA</option>
+            <option>RUSDIANSYAH</option>
+            <option>SAMTIDAR</option>
+            <option>SAR'ANI</option>
+            <option>SARTINI</option>
+            <option>SAPTINO</option>
+            <option>STEPHANUS PUJI SETIAWAN</option>
+            <option>SUHAIMI</option>
+            <option>SUDARTO</option>
+            <option>SUMIATI</option>
+            <option>SUPARJO</option>
+            <option>SURIYANTO</option>
+            <option>TAUPIT</option>
+            <option>TEGUH PRIONO</option>
+            <option>TULUS PRIADI</option>
+            <option>U. NASHIRUDDIN</option>
+            <option>VOLENDI</option>
+            <option>WAHIDAH</option>
+            <option>WINARDI</option>
+            <option>WIWIT</option>
+            <option>YANTI</option>
+            <option>YENI DARMILA</option>
+            <option>YUNIA</option>
+            <option>YUSNANI</option>
+            <option>ZULPIANA</option>
+          </select>
+        </div>
+        
+        <button type="submit" class="login-btn">🚀 Login sebagai User</button>
+      </form>
+      
+      <div class="form-links">
+        <p>Login sebagai user untuk mengisi form monitoring LTT & LTP</p>
       </div>
-
-      <div class="form-group">
-        <label for="penyuluhName">Nama Penyuluh</label>
-        <select id="penyuluhName" required>
-          <option value="">-- Pilih Nama Penyuluh --</option>
-          <option>A.PURNAMA PUTRA</option>
-          <option>AAN PUJINURINSAN</option>
-          <option>ABDUL RAHMAN</option>
-          <option>AGUS SAIFUDDIN</option>
-          <option>AGUSMANTO</option>
-          <option>AHADI</option>
-          <option>ALMIZAN</option>
-          <option>ALWAN SASRUDIN</option>
-          <option>ANDI</option>
-          <option>ANDI WIHARDI</option>
-          <option>ANDI WILLIAM</option>
-          <option>ANTO SAPUTRA</option>
-          <option>ARAMIYA</option>
-          <option>BUDI SETIAWAN</option>
-          <option>DARMA IRAWAN</option>
-          <option>DARMADI</option>
-          <option>DARUSSALAM</option>
-          <option>DINO</option>
-          <option>DIYANTO</option>
-          <option>EDI WAHYUDI</option>
-          <option>EDWARDI</option>
-          <option>EKO SURYONO</option>
-          <option>ELYA KANDAU</option>
-          <option>EMELDA</option>
-          <option>ESPAHANI</option>
-          <option>FITRIANI</option>
-          <option>FREEADI</option>
-          <option>HENGKY KUSUMA INDRA</option>
-          <option>HERY PRAMONO</option>
-          <option>IBNU ROSIHAN</option>
-          <option>IMANSYAH</option>
-          <option>IRLAH</option>
-          <option>IWAN APRIANTO</option>
-          <option>JAKA SUBHAN</option>
-          <option>JAWARI</option>
-          <option>JAYA HARTO</option>
-          <option>JUANDA</option>
-          <option>JUANDI</option>
-          <option>JUMIATI</option>
-          <option>KAMRAN</option>
-          <option>KARNILA</option>
-          <option>K.BUDIMAN</option>
-          <option>LILI SINTA RUSTIKA</option>
-          <option>MARNI</option>
-          <option>MUHAMMAD IRHAMSYAH</option>
-          <option>MUHAMMAD SAHADI</option>
-          <option>MULYADI</option>
-          <option>MURNI HADI</option>
-          <option>MURNIATI</option>
-          <option>NAZRULLAH</option>
-          <option>NEVI ARYATI</option>
-          <option>NIRLAWATI</option>
-          <option>NINING MUSWANI</option>
-          <option>NOVI YANA</option>
-          <option>NURLENA</option>
-          <option>NURHAYATI</option>
-          <option>NUR LAILA SARI</option>
-          <option>RAKHMAD BURHAN</option>
-          <option>RENA</option>
-          <option>RIAN PRASOJO</option>
-          <option>RIZA NOVINA</option>
-          <option>ROMI</option>
-          <option>RONA NURBAYA</option>
-          <option>RUSDIANSYAH</option>
-          <option>SAMTIDAR</option>
-          <option>SAR'ANI</option>
-          <option>SARTINI</option>
-          <option>SAPTINO</option>
-          <option>STEPHANUS PUJI SETIAWAN</option>
-          <option>SUHAIMI</option>
-          <option>SUDARTO</option>
-          <option>SUMIATI</option>
-          <option>SUPARJO</option>
-          <option>SURIYANTO</option>
-          <option>TAUPIT</option>
-          <option>TEGUH PRIONO</option>
-          <option>TULUS PRIADI</option>
-          <option>U. NASHIRUDDIN</option>
-          <option>VOLENDI</option>
-          <option>WAHIDAH</option>
-          <option>WINARDI</option>
-          <option>WIWIT</option>
-          <option>YANTI</option>
-          <option>YENI DARMILA</option>
-          <option>YUNIA</option>
-          <option>YUSNANI</option>
-          <option>ZULPIANA</option>
-        </select>
-      </div>
-
-      <button type="submit" class="login-btn" id="userLoginBtn">
-        <span class="spinner"></span>
-        <span class="btn-text">🚀 Login sebagai User</span>
-      </button>
-    </form>
-
-    <!-- Admin Login Form -->
-    <form id="adminLoginForm" class="login-form">
-      <div class="form-group">
-        <label for="adminUsername">Username Admin</label>
-        <input type="text" id="adminUsername" placeholder="Masukkan username admin" required autocomplete="username">
-      </div>
-
-      <div class="form-group">
-        <label for="adminPassword">Password Admin</label>
-        <input type="password" id="adminPassword" placeholder="Masukkan password admin" required autocomplete="current-password">
-      </div>
-
-      <button type="submit" class="login-btn" id="adminLoginBtn">
-        <span class="spinner"></span>
-        <span class="btn-text">🛠️ Login sebagai Admin</span>
-      </button>
-    </form>
-
-    <div class="forgot-password">
-      <a href="#" onclick="showForgotPassword()">Lupa kode akses atau password?</a>
     </div>
 
-    <!-- Demo Information -->
-    <div class="login-info">
-      <h4>ℹ️ Informasi Login Demo</h4>
-      <p><strong>User Login:</strong> Gunakan kode akses dan pilih nama penyuluh</p>
-      <div class="demo-codes">
-        <div class="demo-code">USER001</div>
-        <div class="demo-code">USER002</div>
-        <div class="demo-code">USER003</div>
-        <div class="demo-code">DEMO123</div>
+    <!-- Admin Login Form -->
+    <div id="adminLoginForm" class="login-form">
+      <div id="adminError" class="login-error"></div>
+      <div id="adminSuccess" class="login-success"></div>
+      
+      <form id="adminForm">
+        <div class="form-group">
+          <label>Kode Akses Admin</label>
+          <input type="password" id="adminAccessCode" placeholder="Masukkan kode akses admin" required />
+        </div>
+        
+        <div class="form-group">
+          <label>Nama Admin</label>
+          <input type="text" id="adminName" placeholder="Masukkan nama admin" value="Administrator" required />
+        </div>
+        
+        <button type="submit" class="login-btn admin-btn">🛠️ Login sebagai Admin</button>
+      </form>
+      
+      <div class="form-links">
+        <p>Login sebagai admin untuk mengelola sistem dan user</p>
       </div>
-      <p style="margin-top: 10px;"><strong>Admin Login:</strong></p>
-      <div class="demo-codes">
-        <div class="demo-code">admin / admin123</div>
-        <div class="demo-code">supervisor / super123</div>
-      </div>
+    </div>
+
+    <div class="system-info">
+      <p><strong>Informasi Sistem:</strong></p>
+      <p>• Sistem Monitoring LTT & LTP v2.0</p>
+      <p>• Session Duration: 8 jam</p>
+      <p>• Auto-save: Aktif</p>
+      <p>• Offline Support: Tersedia</p>
     </div>
   </div>
 
   <script>
-    // ============ CONSTANTS ============
-    
-    const SESSION_KEY = 'ltt_session';
-    const ADMIN_SESSION_KEY = 'ltt_admin_session';
-    const SESSION_DURATION = 8 * 60 * 60 * 1000; // 8 jam
-    const MAX_LOGIN_ATTEMPTS = 3;
-    const LOCKOUT_DURATION = 30 * 60 * 1000; // 30 menit
-    
-    // ============ LOGIN ATTEMPT TRACKING ============
-    
-    function getLoginAttempts(type = 'user') {
-      const key = `ltt_login_attempts_${type}`;
-      const attempts = localStorage.getItem(key);
-      if (!attempts) return { count: 0, lastAttempt: 0 };
-      
-      try {
-        return JSON.parse(attempts);
-      } catch {
-        return { count: 0, lastAttempt: 0 };
-      }
-    }
+    // Configuration
+    const CONFIG = {
+      scriptURL: 'https://script.google.com/macros/s/AKfycbwudT-kBFuokAH3XwPv8Nlt7O-3AN4cm2YDZt2bnJlUvRNNcO3BGwmtM_6rhej9-oTg/exec',
+      userSessionKey: 'ltt_user_session',
+      adminSessionKey: 'ltt_admin_session'
+    };
 
-    function setLoginAttempts(type = 'user', count) {
-      const key = `ltt_login_attempts_${type}`;
-      const data = {
-        count: count,
-        lastAttempt: Date.now()
-      };
-      localStorage.setItem(key, JSON.stringify(data));
-    }
-
-    function isAccountLocked(type = 'user') {
-      const attempts = getLoginAttempts(type);
-      if (attempts.count >= MAX_LOGIN_ATTEMPTS) {
-        const timeSinceLast = Date.now() - attempts.lastAttempt;
-        return timeSinceLast < LOCKOUT_DURATION;
-      }
-      return false;
-    }
-
-    function getRemainingLockoutTime(type = 'user') {
-      const attempts = getLoginAttempts(type);
-      const timeSinceLast = Date.now() - attempts.lastAttempt;
-      const remaining = LOCKOUT_DURATION - timeSinceLast;
-      return Math.max(0, remaining);
-    }
-
-    function clearLoginAttempts(type = 'user') {
-      const key = `ltt_login_attempts_${type}`;
-      localStorage.removeItem(key);
-    }
-
-    // ============ UI FUNCTIONS ============
-    
+    // Tab switching
     function switchTab(tabType) {
-      // Hide all forms
-      document.querySelectorAll('.login-form').forEach(form => {
-        form.classList.remove('active');
-      });
-      
-      // Remove active from all tabs
-      document.querySelectorAll('.tab-btn').forEach(btn => {
-        btn.classList.remove('active');
-      });
-      
-      // Show selected form
-      const formId = tabType === 'admin' ? 'adminLoginForm' : 'userLoginForm';
-      document.getElementById(formId).classList.add('active');
-      
-      // Mark tab as active
+      // Update tab buttons
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
       event.target.classList.add('active');
       
-      // Clear messages
-      clearMessages();
+      // Update forms
+      document.querySelectorAll('.login-form').forEach(form => form.classList.remove('active'));
       
-      // Check lockout status for current tab
-      checkLockoutStatus(tabType);
-    }
-
-    function showMessage(message, type = 'error') {
-      clearMessages();
-      
-      const messageEl = document.getElementById(type + 'Message');
-      if (messageEl) {
-        messageEl.textContent = message;
-        messageEl.style.display = 'block';
-        
-        // Auto hide after 5 seconds
-        setTimeout(() => {
-          messageEl.style.display = 'none';
-        }, 5000);
-      }
-    }
-
-    function clearMessages() {
-      document.getElementById('errorMessage').style.display = 'none';
-      document.getElementById('successMessage').style.display = 'none';
-      document.getElementById('attemptsWarning').style.display = 'none';
-    }
-
-    function showAttemptsWarning(attempts, maxAttempts, type) {
-      const warningEl = document.getElementById('attemptsWarning');
-      const remaining = maxAttempts - attempts;
-      
-      if (attempts > 0 && attempts < maxAttempts) {
-        warningEl.textContent = `⚠️ Percobaan login gagal ${attempts}/${maxAttempts}. Sisa ${remaining} percobaan lagi.`;
-        warningEl.style.display = 'block';
-      } else if (attempts >= maxAttempts) {
-        const lockTime = Math.ceil(getRemainingLockoutTime(type) / 60000);
-        warningEl.textContent = `🔒 Akun terkunci selama ${lockTime} menit karena terlalu banyak percobaan login gagal.`;
-        warningEl.style.display = 'block';
-      }
-    }
-
-    function checkLockoutStatus(type) {
-      if (isAccountLocked(type)) {
-        const lockTime = Math.ceil(getRemainingLockoutTime(type) / 60000);
-        showMessage(`Akun terkunci selama ${lockTime} menit. Silakan coba lagi nanti.`, 'error');
-        
-        const submitBtn = type === 'admin' ? 'adminLoginBtn' : 'userLoginBtn';
-        document.getElementById(submitBtn).disabled = true;
-        
-        // Update button text
-        const btnText = document.querySelector(`#${submitBtn} .btn-text`);
-        btnText.textContent = `🔒 Terkunci (${lockTime} menit)`;
-        
-        // Set timeout to unlock
-        setTimeout(() => {
-          checkLockoutStatus(type);
-        }, 60000);
+      if (tabType === 'user') {
+        document.getElementById('userLoginForm').classList.add('active');
       } else {
-        const submitBtn = type === 'admin' ? 'adminLoginBtn' : 'userLoginBtn';
-        const btn = document.getElementById(submitBtn);
-        btn.disabled = false;
-        
-        const btnText = document.querySelector(`#${submitBtn} .btn-text`);
-        btnText.textContent = type === 'admin' ? '🛠️ Login sebagai Admin' : '🚀 Login sebagai User';
-        
-        // Show attempts warning if any
-        const attempts = getLoginAttempts(type);
-        if (attempts.count > 0) {
-          showAttemptsWarning(attempts.count, MAX_LOGIN_ATTEMPTS, type);
-        }
+        document.getElementById('adminLoginForm').classList.add('active');
       }
+      
+      // Clear any previous errors
+      clearErrors();
     }
 
-    function setLoading(btnId, loading = true) {
-      const btn = document.getElementById(btnId);
-      const btnText = btn.querySelector('.btn-text');
-      
-      if (loading) {
-        btn.classList.add('loading');
-        btn.disabled = true;
-        btnText.textContent = 'Memproses...';
-      } else {
-        btn.classList.remove('loading');
-        btn.disabled = false;
-        
-        if (btnId === 'adminLoginBtn') {
-          btnText.textContent = '🛠️ Login sebagai Admin';
-        } else {
-          btnText.textContent = '🚀 Login sebagai User';
-        }
-      }
+    // Clear error messages
+    function clearErrors() {
+      document.getElementById('userError').style.display = 'none';
+      document.getElementById('adminError').style.display = 'none';
+      document.getElementById('userSuccess').style.display = 'none';
+      document.getElementById('adminSuccess').style.display = 'none';
     }
 
-    // ============ AUTHENTICATION FUNCTIONS ============
-    
-    function createUserSession(accessCode, penyuluhName) {
-      const sessionData = {
-        accessCode: accessCode,
-        penyuluhName: penyuluhName,
-        loginTime: Date.now(),
-        expiresAt: Date.now() + SESSION_DURATION,
-        role: 'user'
-      };
+    // Show loading overlay
+    function showLoading() {
+      document.getElementById('loadingOverlay').style.display = 'flex';
+    }
+
+    // Hide loading overlay
+    function hideLoading() {
+      document.getElementById('loadingOverlay').style.display = 'none';
+    }
+
+    // Show error message
+    function showError(type, message) {
+      const errorEl = document.getElementById(type + 'Error');
+      errorEl.textContent = message;
+      errorEl.style.display = 'block';
+    }
+
+    // Show success message
+    function showSuccess(type, message) {
+      const successEl = document.getElementById(type + 'Success');
+      successEl.textContent = message;
+      successEl.style.display = 'block';
+    }
+
+    // User login handler
+    document.getElementById('userForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      clearErrors();
       
-      localStorage.setItem(SESSION_KEY, JSON.stringify(sessionData));
+      const accessCode = document.getElementById('userAccessCode').value.trim();
+      const penyuluhName = document.getElementById('userPenyuluhName').value;
       
-      // Broadcast login event
-      if (typeof BroadcastChannel !== 'undefined') {
-        const channel = new BroadcastChannel('ltt_admin_updates');
-        channel.postMessage({
-          type: 'USER_LOGIN',
-          data: { accessCode, penyuluhName, timestamp: Date.now() }
+      if (!accessCode || !penyuluhName) {
+        showError('user', 'Semua field harus diisi');
+        return;
+      }
+      
+      showLoading();
+      
+      try {
+        const formData = new FormData();
+        formData.append('action', 'login');
+        formData.append('access_code', accessCode);
+        formData.append('penyuluh_name', penyuluhName);
+        
+        const response = await fetch(CONFIG.scriptURL, {
+          method: 'POST',
+          body: formData
         });
-      }
-      
-      return sessionData;
-    }
-
-    function createAdminSession(username) {
-      const sessionData = {
-        adminName: username,
-        loginTime: Date.now(),
-        expiresAt: Date.now() + SESSION_DURATION,
-        role: 'admin'
-      };
-      
-      localStorage.setItem(ADMIN_SESSION_KEY, JSON.stringify(sessionData));
-      return sessionData;
-    }
-
-    function validateUserLogin(accessCode, penyuluhName) {
-      // Validasi kode akses (demo codes)
-      const validCodes = ['USER001', 'USER002', 'USER003', 'DEMO123', 'TEST001'];
-      
-      if (!validCodes.includes(accessCode.toUpperCase())) {
-        return { valid: false, message: 'Kode akses tidak valid' };
-      }
-      
-      if (!penyuluhName) {
-        return { valid: false, message: 'Pilih nama penyuluh terlebih dahulu' };
-      }
-      
-      return { valid: true };
-    }
-
-    function validateAdminLogin(username, password) {
-      // Demo admin credentials
-      const adminCredentials = {
-        'admin': 'admin123',
-        'supervisor': 'super123',
-        'root': 'root123'
-      };
-      
-      if (!adminCredentials[username.toLowerCase()]) {
-        return { valid: false, message: 'Username admin tidak ditemukan' };
-      }
-      
-      if (adminCredentials[username.toLowerCase()] !== password) {
-        return { valid: false, message: 'Password admin salah' };
-      }
-      
-      return { valid: true };
-    }
-
-    // ============ FORM HANDLERS ============
-    
-    document.getElementById('userLoginForm').addEventListener('submit', async function(e) {
-      e.preventDefault();
-      
-      if (isAccountLocked('user')) {
-        const lockTime = Math.ceil(getRemainingLockoutTime('user') / 60000);
-        showMessage(`Akun terkunci selama ${lockTime} menit`, 'error');
-        return;
-      }
-      
-      const accessCode = document.getElementById('accessCode').value.trim();
-      const penyuluhName = document.getElementById('penyuluhName').value;
-      
-      setLoading('userLoginBtn', true);
-      clearMessages();
-      
-      // Simulate API call delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      const validation = validateUserLogin(accessCode, penyuluhName);
-      
-      if (validation.valid) {
-        // Login successful
-        createUserSession(accessCode, penyuluhName);
-        clearLoginAttempts('user');
         
-        showMessage('Login berhasil! Mengalihkan ke dashboard...', 'success');
+        const result = await response.json();
         
-        setTimeout(() => {
-          window.location.href = 'index.html'; // Redirect ke halaman utama
-        }, 1500);
-      } else {
-        // Login failed
-        const attempts = getLoginAttempts('user');
-        const newAttemptCount = attempts.count + 1;
-        setLoginAttempts('user', newAttemptCount);
-        
-        showMessage(validation.message, 'error');
-        
-        // Add error animation to inputs
-        document.getElementById('accessCode').classList.add('error');
-        setTimeout(() => {
-          document.getElementById('accessCode').classList.remove('error');
-        }, 500);
-        
-        // Check if account should be locked
-        if (newAttemptCount >= MAX_LOGIN_ATTEMPTS) {
-          checkLockoutStatus('user');
+        if (result.success) {
+          // Save session
+          localStorage.setItem(CONFIG.userSessionKey, JSON.stringify(result.session));
+          
+          showSuccess('user', 'Login berhasil! Mengalihkan ke halaman utama...');
+          
+          // Redirect to main page after 2 seconds
+          setTimeout(() => {
+            window.location.href = 'index.html';
+          }, 2000);
         } else {
-          showAttemptsWarning(newAttemptCount, MAX_LOGIN_ATTEMPTS, 'user');
+          showError('user', result.error || 'Login gagal');
         }
+      } catch (error) {
+        console.error('User login error:', error);
+        showError('user', 'Koneksi bermasalah. Silakan coba lagi.');
+      } finally {
+        hideLoading();
       }
-      
-      setLoading('userLoginBtn', false);
     });
 
-    document.getElementById('adminLoginForm').addEventListener('submit', async function(e) {
+    // Admin login handler
+    document.getElementById('adminForm').addEventListener('submit', async (e) => {
       e.preventDefault();
+      clearErrors();
       
-      if (isAccountLocked('admin')) {
-        const lockTime = Math.ceil(getRemainingLockoutTime('admin') / 60000);
-        showMessage(`Akun admin terkunci selama ${lockTime} menit`, 'error');
+      const accessCode = document.getElementById('adminAccessCode').value.trim();
+      const adminName = document.getElementById('adminName').value.trim();
+      
+      if (!accessCode || !adminName) {
+        showError('admin', 'Semua field harus diisi');
         return;
       }
       
-      const username = document.getElementById('adminUsername').value.trim();
-      const password = document.getElementById('adminPassword').value;
+      showLoading();
       
-      setLoading('adminLoginBtn', true);
-      clearMessages();
-      
-      // Simulate API call delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      const validation = validateAdminLogin(username, password);
-      
-      if (validation.valid) {
-        // Admin login successful
-        createAdminSession(username);
-        clearLoginAttempts('admin');
+      try {
+        const formData = new FormData();
+        formData.append('action', 'admin_login');
+        formData.append('access_code', accessCode);
+        formData.append('admin_name', adminName);
         
-        showMessage('Login admin berhasil! Mengalihkan ke admin panel...', 'success');
-        
-        setTimeout(() => {
-          window.location.href = 'admin.html'; // Redirect ke admin panel
-        }, 1500);
-      } else {
-        // Admin login failed
-        const attempts = getLoginAttempts('admin');
-        const newAttemptCount = attempts.count + 1;
-        setLoginAttempts('admin', newAttemptCount);
-        
-        showMessage(validation.message, 'error');
-        
-        // Add error animation to inputs
-        document.getElementById('adminUsername').classList.add('error');
-        document.getElementById('adminPassword').classList.add('error');
-        setTimeout(() => {
-          document.getElementById('adminUsername').classList.remove('error');
-          document.getElementById('adminPassword').classList.remove('error');
-        }, 500);
-        
-        // Check if account should be locked
-        if (newAttemptCount >= MAX_LOGIN_ATTEMPTS) {
-          checkLockoutStatus('admin');
-        } else {
-          showAttemptsWarning(newAttemptCount, MAX_LOGIN_ATTEMPTS, 'admin');
-        }
-      }
-      
-      setLoading('adminLoginBtn', false);
-    });
-
-    // ============ UTILITY FUNCTIONS ============
-    
-    function showForgotPassword() {
-      alert('Untuk reset kode akses atau password, silakan hubungi administrator sistem di email: admin@ltt-ltp.go.id atau telepon: (0561) 123-4567');
-    }
-
-    function checkExistingSessions() {
-      // Check if user already logged in
-      const userSession = localStorage.getItem(SESSION_KEY);
-      if (userSession) {
-        try {
-          const sessionData = JSON.parse(userSession);
-          if (Date.now() < sessionData.expiresAt) {
-            // User session still valid
-            showMessage('Anda sudah login. Mengalihkan ke dashboard...', 'success');
-            setTimeout(() => {
-              window.location.href = 'index.html';
-            }, 1500);
-            return true;
-          }
-        } catch (e) {
-          localStorage.removeItem(SESSION_KEY);
-        }
-      }
-      
-      // Check if admin already logged in
-      const adminSession = localStorage.getItem(ADMIN_SESSION_KEY);
-      if (adminSession) {
-        try {
-          const sessionData = JSON.parse(adminSession);
-          if (Date.now() < sessionData.expiresAt) {
-            // Admin session still valid
-            showMessage('Anda sudah login sebagai admin. Mengalihkan ke admin panel...', 'success');
-            setTimeout(() => {
-              window.location.href = 'admin.html';
-            }, 1500);
-            return true;
-          }
-        } catch (e) {
-          localStorage.removeItem(ADMIN_SESSION_KEY);
-        }
-      }
-      
-      return false;
-    }
-
-    // ============ MONTH LOCK INTEGRATION ============
-    
-    function checkMonthLockStatus() {
-      const monthLockConfig = localStorage.getItem('ltt_month_lock_config');
-      if (monthLockConfig) {
-        try {
-          const lockConfig = JSON.parse(monthLockConfig);
-          if (lockConfig.enabled && lockConfig.message) {
-            // Show month lock message
-            const lockInfo = document.createElement('div');
-            lockInfo.style.cssText = `
-              background: #fff3cd;
-              color: #856404;
-              padding: 15px;
-              border-radius: 10px;
-              margin-bottom: 20px;
-              border-left: 4px solid #ffc107;
-              font-size: 14px;
-            `;
-            lockInfo.innerHTML = `
-              <strong>🔒 Pemberitahuan Sistem:</strong><br>
-              ${lockConfig.message}
-            `;
-            
-            const container = document.querySelector('.login-container');
-            const header = document.querySelector('.login-header');
-            container.insertBefore(lockInfo, header.nextSibling);
-          }
-        } catch (e) {
-          console.log('Error parsing month lock config:', e);
-        }
-      }
-    }
-
-    // ============ BROADCAST CHANNEL LISTENER ============
-    
-    if (typeof BroadcastChannel !== 'undefined') {
-      const channel = new BroadcastChannel('ltt_admin_updates');
-      
-      channel.addEventListener('message', (event) => {
-        const { type, data } = event.data;
-        
-        switch (type) {
-          case 'FORCE_LOGOUT_ALL':
-            // Admin forced logout all users
-            localStorage.removeItem(SESSION_KEY);
-            showMessage('Anda telah di-logout oleh administrator', 'error');
-            break;
-            
-          case 'ADMIN_MESSAGE':
-            // Admin broadcast message
-            showMessage(data.message, 'error');
-            break;
-            
-          case 'MONTH_LOCK_UPDATE':
-            // Month lock settings updated
-            setTimeout(() => {
-              location.reload();
-            }, 1000);
-            break;
-        }
-      });
-    }
-
-    // ============ INITIALIZATION ============
-    
-    document.addEventListener('DOMContentLoaded', function() {
-      // Check if already logged in
-      if (checkExistingSessions()) {
-        return;
-      }
-      
-      // Check lockout status for both user and admin
-      checkLockoutStatus('user');
-      checkLockoutStatus('admin');
-      
-      // Check month lock status
-      checkMonthLockStatus();
-      
-      // Auto-focus first input
-      document.getElementById('accessCode').focus();
-      
-      // Clear any expired sessions
-      const userSession = localStorage.getItem(SESSION_KEY);
-      if (userSession) {
-        try {
-          const sessionData = JSON.parse(userSession);
-          if (Date.now() >= sessionData.expiresAt) {
-            localStorage.removeItem(SESSION_KEY);
-          }
-        } catch (e) {
-          localStorage.removeItem(SESSION_KEY);
-        }
-      }
-      
-      const adminSession = localStorage.getItem(ADMIN_SESSION_KEY);
-      if (adminSession) {
-        try {
-          const sessionData = JSON.parse(adminSession);
-          if (Date.now() >= sessionData.expiresAt) {
-            localStorage.removeItem(ADMIN_SESSION_KEY);
-          }
-        } catch (e) {
-          localStorage.removeItem(ADMIN_SESSION_KEY);
-        }
-      }
-    });
-
-    // ============ KEYBOARD SHORTCUTS ============
-    
-    document.addEventListener('keydown', function(e) {
-      // Alt + A untuk switch ke admin tab
-      if (e.altKey && e.key === 'a') {
-        e.preventDefault();
-        document.querySelector('.tab-btn:last-child').click();
-        document.getElementById('adminUsername').focus();
-      }
-      
-      // Alt + U untuk switch ke user tab
-      if (e.altKey && e.key === 'u') {
-        e.preventDefault();
-        document.querySelector('.tab-btn:first-child').click();
-        document.getElementById('accessCode').focus();
-      }
-    });
-
-    // ============ AUTO-CLEANUP ============
-    
-    // Clean up expired sessions every 5 minutes
-    setInterval(() => {
-      const now = Date.now();
-      
-      // Clean expired user sessions
-      const userSession = localStorage.getItem(SESSION_KEY);
-      if (userSession) {
-        try {
-          const sessionData = JSON.parse(userSession);
-          if (now >= sessionData.expiresAt) {
-            localStorage.removeItem(SESSION_KEY);
-          }
-        } catch (e) {
-          localStorage.removeItem(SESSION_KEY);
-        }
-      }
-      
-      // Clean expired admin sessions
-      const adminSession = localStorage.getItem(ADMIN_SESSION_KEY);
-      if (adminSession) {
-        try {
-          const sessionData = JSON.parse(adminSession);
-          if (now >= sessionData.expiresAt) {
-            localStorage.removeItem(ADMIN_SESSION_KEY);
-          }
-        } catch (e) {
-          localStorage.removeItem(ADMIN_SESSION_KEY);
-        }
-      }
-      
-      // Clean expired login attempts
-      ['user', 'admin'].forEach(type => {
-        const attempts = getLoginAttempts(type);
-        if (attempts.count > 0 && (now - attempts.lastAttempt) > LOCKOUT_DURATION) {
-          clearLoginAttempts(type);
-          checkLockoutStatus(type);
-        }
-      });
-    }, 5 * 60 * 1000);
-  </script>
-</body>
-</html>
+        const response = await fetch(CONFIG.scriptURL
