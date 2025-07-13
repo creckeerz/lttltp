@@ -37,13 +37,22 @@
 
     .login-header h1 {
       color: #2c3e50;
-      font-size: 32px;
-      margin-bottom: 10px;
+      font-size: 28px;
+      margin-bottom: 8px;
+      font-weight: 700;
+    }
+
+    .login-header .subtitle {
+      color: #34495e;
+      font-size: 14px;
+      margin-bottom: 15px;
+      font-weight: 500;
+      line-height: 1.4;
     }
 
     .login-header p {
       color: #7f8c8d;
-      font-size: 16px;
+      font-size: 13px;
     }
 
     .login-tabs {
@@ -108,6 +117,12 @@
       outline: none;
       border-color: #3498db;
       box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+    }
+
+    .form-group input:readonly {
+      background-color: #f8f9fa;
+      cursor: not-allowed;
+      color: #666;
     }
 
     .login-btn {
@@ -203,6 +218,13 @@
       margin-bottom: 20px;
     }
 
+    .info-text {
+      font-size: 12px;
+      color: #666;
+      margin-top: 5px;
+      font-style: italic;
+    }
+
     @keyframes spin {
       0% { transform: rotate(0deg); }
       100% { transform: rotate(360deg); }
@@ -217,6 +239,10 @@
       .login-header h1 {
         font-size: 24px;
       }
+      
+      .login-header .subtitle {
+        font-size: 12px;
+      }
     }
   </style>
 </head>
@@ -230,8 +256,9 @@
 
   <div class="login-container">
     <div class="login-header">
-      <h1>🔐 Login Sistem</h1>
-      <p>Form Monitoring LTT & LTP</p>
+      <h1>📋 Form Monitoring LTT & LTP</h1>
+      <div class="subtitle">Sistem Monitoring Luas Tambah Tanam dan Luas Tambah Panen</div>
+      <p>Silakan login untuk mengakses sistem</p>
     </div>
 
     <!-- Tab Navigation -->
@@ -246,102 +273,103 @@
       <div id="userSuccess" class="login-success"></div>
       
       <form id="userForm">
-         <div class="form-group">
-                <label for="accessCode">Kode Akses</label>
-                <input type="text" id="accessCode" placeholder="Pilih nama penyuluh terlebih dahulu" readonly />
-        
-        <form id="loginForm">
-            <div class="form-group">
-                <label for="penyuluhName">Nama Penyuluh</label>
-                <select id="penyuluhName" required>
-                    <option value="">-- Pilih Nama Penyuluh --</option>
-                    <option value="PURNAMA">A.PURNAMA PUTRA</option>
-                    <option value="AAN">AAN PUJINURINSAN</option>
-                    <option value="ABDUL">ABDUL RAHMAN</option>
-                    <option value="AGUS">AGUS SAIFUDDIN</option>
-                    <option value="AGUSMANTO">AGUSMANTO</option>
-                    <option value="AHADI">AHADI</option>
-                    <option value="ALMIZAN">ALMIZAN</option>
-                    <option value="ALWAN">ALWAN SASRUDIN</option>
-                    <option value="ANDI">ANDI</option>
-                    <option value="ANDIWIHARDI">ANDI WIHARDI</option>
-                    <option value="ANDIWILLIAM">ANDI WILLIAM</option>
-                    <option value="ANTO">ANTO SAPUTRA</option>
-                    <option value="ARAMIYA">ARAMIYA</option>
-                    <option value="BUDISETIAWAN">BUDI SETIAWAN</option>
-                    <option value="DARMA">DARMA IRAWAN</option>
-                    <option value="DARUSSALAM">DARUSSALAM</option>
-                    <option value="DINO">DINO</option>
-                    <option value="DIYANTO">DIYANTO</option>
-                    <option value="EDI">EDI WAHYUDI</option>
-                    <option value="EDWARDI">EDWARDI</option>
-                    <option value="EKO">EKO SURYONO</option>
-                    <option value="ELYA">ELYA KANDAU</option>
-                    <option value="EMELDA">EMELDA</option>
-                    <option value="ESPAHANI">ESPAHANI</option>
-                    <option value="FITRIANI">FITRIANI</option>
-                    <option value="FREEADI">FREEADI</option>
-                    <option value="HENGKY">HENGKY KUSUMA INDRA</option>
-                    <option value="HERY">HERY PRAMONO</option>
-                    <option value="IBNU">IBNU ROSIHAN</option>
-                    <option value="IMANSYAH">IMANSYAH</option>
-                    <option value="IRLAH">IRLAH</option>
-                    <option value="IWAN">IWAN APRIANTO</option>
-                    <option value="JAKA">JAKA SUBHAN</option>
-                    <option value="JAWARI">JAWARI</option>
-                    <option value="JAYAHARTO">JAYA HARTO</option>
-                    <option value="JUANDA">JUANDA</option>
-                    <option value="JUANDI">JUANDI</option>
-                    <option value="JUMIATI">JUMIATI</option>
-                    <option value="KAMRAN">KAMRAN</option>
-                    <option value="KARNILA">KARNILA</option>
-                    <option value="BUDIMAN">K.BUDIMAN</option>
-                    <option value="LILI">LILI SINTA RUSTIKA</option>
-                    <option value="MARNI">MARNI</option>
-                    <option value="IRHAMSYAH">MUHAMMAD IRHAMSYAH</option>
-                    <option value="SAHADI">MUHAMMAD SAHADI</option>
-                    <option value="MULYADI">MULYADI</option>
-                    <option value="MURNI">MURNI HADI</option>
-                    <option value="MURNIATI">MURNIATI</option>
-                    <option value="NAZRULLAH">NAZRULLAH</option>
-                    <option value="NEVI">NEVI ARYATI</option>
-                    <option value="NIRLAWATI">NIRLAWATI</option>
-                    <option value="NINING">NINING MUSWANI</option>
-                    <option value="NOVIYANA">NOVI YANA</option>
-                    <option value="NURLENA">NURLENA</option>
-                    <option value="NURHAYATI">NURHAYATI</option>
-                    <option value="NURLAILA">NUR LAILA SARI</option>
-                    <option value="RAKHMAD">RAKHMAD BURHAN</option>
-                    <option value="RENA">RENA</option>
-                    <option value="RIAN">RIAN PRASOJO</option>
-                    <option value="RIZA">RIZA NOVINA</option>
-                    <option value="ROMI">ROMI</option>
-                    <option value="RONA">RONA NURBAYA</option>
-                    <option value="RUSDIANSYAH">RUSDIANSYAH</option>
-                    <option value="SAMTIDAR">SAMTIDAR</option>
-                    <option value="SARANI">SAR'ANI</option>
-                    <option value="SARTINI">SARTINI</option>
-                    <option value="SAPTINO">SAPTINO</option>
-                    <option value="STEPHANUS">STEPHANUS PUJI SETIAWAN</option>
-                    <option value="SUHAIMI">SUHAIMI</option>
-                    <option value="SUDARTO">SUDARTO</option>
-                    <option value="SUMIATI">SUMIATI</option>
-                    <option value="SUPARJO">SUPARJO</option>
-                    <option value="SURIYANTO">SURIYANTO</option>
-                    <option value="TAUPIT">TAUPIT</option>
-                    <option value="TEGUH">TEGUH PRIONO</option>
-                    <option value="TULUS">TULUS PRIADI</option>
-                    <option value="NASHIRUDDIN">U. NASHIRUDDIN</option>
-                    <option value="VOLENDI">VOLENDI</option>
-                    <option value="WINARDI">WINARDI</option>
-                    <option value="WIWIT">WIWIT</option>
-                    <option value="YANTI">YANTI</option>
-                    <option value="YENI">YENI DARMILA</option>
-                    <option value="YUNIA">YUNIA</option>
-                    <option value="YUSNANI">YUSNANI</option>
-                    <option value="ZULPIANA">ZULPIANA</option>
-                </select>
-            </div>
+        <div class="form-group">
+          <label for="penyuluhName">Nama Penyuluh</label>
+          <select id="penyuluhName" required>
+            <option value="">-- Pilih Nama Penyuluh --</option>
+            <option value="PURNAMA">A.PURNAMA PUTRA</option>
+            <option value="AAN">AAN PUJINURINSAN</option>
+            <option value="ABDUL">ABDUL RAHMAN</option>
+            <option value="AGUS">AGUS SAIFUDDIN</option>
+            <option value="AGUSMANTO">AGUSMANTO</option>
+            <option value="AHADI">AHADI</option>
+            <option value="ALMIZAN">ALMIZAN</option>
+            <option value="ALWAN">ALWAN SASRUDIN</option>
+            <option value="ANDI">ANDI</option>
+            <option value="ANDIWIHARDI">ANDI WIHARDI</option>
+            <option value="ANDIWILLIAM">ANDI WILLIAM</option>
+            <option value="ANTO">ANTO SAPUTRA</option>
+            <option value="ARAMIYA">ARAMIYA</option>
+            <option value="BUDISETIAWAN">BUDI SETIAWAN</option>
+            <option value="DARMA">DARMA IRAWAN</option>
+            <option value="DARUSSALAM">DARUSSALAM</option>
+            <option value="DINO">DINO</option>
+            <option value="DIYANTO">DIYANTO</option>
+            <option value="EDI">EDI WAHYUDI</option>
+            <option value="EDWARDI">EDWARDI</option>
+            <option value="EKO">EKO SURYONO</option>
+            <option value="ELYA">ELYA KANDAU</option>
+            <option value="EMELDA">EMELDA</option>
+            <option value="ESPAHANI">ESPAHANI</option>
+            <option value="FITRIANI">FITRIANI</option>
+            <option value="FREEADI">FREEADI</option>
+            <option value="HENGKY">HENGKY KUSUMA INDRA</option>
+            <option value="HERY">HERY PRAMONO</option>
+            <option value="IBNU">IBNU ROSIHAN</option>
+            <option value="IMANSYAH">IMANSYAH</option>
+            <option value="IRLAH">IRLAH</option>
+            <option value="IWAN">IWAN APRIANTO</option>
+            <option value="JAKA">JAKA SUBHAN</option>
+            <option value="JAWARI">JAWARI</option>
+            <option value="JAYAHARTO">JAYA HARTO</option>
+            <option value="JUANDA">JUANDA</option>
+            <option value="JUANDI">JUANDI</option>
+            <option value="JUMIATI">JUMIATI</option>
+            <option value="KAMRAN">KAMRAN</option>
+            <option value="KARNILA">KARNILA</option>
+            <option value="BUDIMAN">K.BUDIMAN</option>
+            <option value="LILI">LILI SINTA RUSTIKA</option>
+            <option value="MARNI">MARNI</option>
+            <option value="IRHAMSYAH">MUHAMMAD IRHAMSYAH</option>
+            <option value="SAHADI">MUHAMMAD SAHADI</option>
+            <option value="MULYADI">MULYADI</option>
+            <option value="MURNI">MURNI HADI</option>
+            <option value="MURNIATI">MURNIATI</option>
+            <option value="NAZRULLAH">NAZRULLAH</option>
+            <option value="NEVI">NEVI ARYATI</option>
+            <option value="NIRLAWATI">NIRLAWATI</option>
+            <option value="NINING">NINING MUSWANI</option>
+            <option value="NOVIYANA">NOVI YANA</option>
+            <option value="NURLENA">NURLENA</option>
+            <option value="NURHAYATI">NURHAYATI</option>
+            <option value="NURLAILA">NUR LAILA SARI</option>
+            <option value="RAKHMAD">RAKHMAD BURHAN</option>
+            <option value="RENA">RENA</option>
+            <option value="RIAN">RIAN PRASOJO</option>
+            <option value="RIZA">RIZA NOVINA</option>
+            <option value="ROMI">ROMI</option>
+            <option value="RONA">RONA NURBAYA</option>
+            <option value="RUSDIANSYAH">RUSDIANSYAH</option>
+            <option value="SAMTIDAR">SAMTIDAR</option>
+            <option value="SARANI">SAR'ANI</option>
+            <option value="SARTINI">SARTINI</option>
+            <option value="SAPTINO">SAPTINO</option>
+            <option value="STEPHANUS">STEPHANUS PUJI SETIAWAN</option>
+            <option value="SUHAIMI">SUHAIMI</option>
+            <option value="SUDARTO">SUDARTO</option>
+            <option value="SUMIATI">SUMIATI</option>
+            <option value="SUPARJO">SUPARJO</option>
+            <option value="SURIYANTO">SURIYANTO</option>
+            <option value="TAUPIT">TAUPIT</option>
+            <option value="TEGUH">TEGUH PRIONO</option>
+            <option value="TULUS">TULUS PRIADI</option>
+            <option value="NASHIRUDDIN">U. NASHIRUDDIN</option>
+            <option value="VOLENDI">VOLENDI</option>
+            <option value="WINARDI">WINARDI</option>
+            <option value="WIWIT">WIWIT</option>
+            <option value="YANTI">YANTI</option>
+            <option value="YENI">YENI DARMILA</option>
+            <option value="YUNIA">YUNIA</option>
+            <option value="YUSNANI">YUSNANI</option>
+            <option value="ZULPIANA">ZULPIANA</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="accessCode">Kode Akses</label>
+          <input type="text" id="accessCode" placeholder="Pilih nama penyuluh terlebih dahulu" readonly />
+          <div class="info-text">Kode akses akan otomatis terisi setelah memilih nama penyuluh</div>
+        </div>
         
         <button type="submit" class="login-btn">🚀 Login sebagai User</button>
       </form>
@@ -383,41 +411,6 @@
       <p>• Offline Support: Tersedia</p>
     </div>
   </div>
-  
-  
-  <script>
-        // Event listener untuk dropdown nama penyuluh
-        document.getElementById('penyuluhName').addEventListener('change', function() {
-            const selectedCode = this.value;
-            const accessCodeInput = document.getElementById('accessCode');
-            
-            if (selectedCode) {
-                // Isi kode akses dengan value yang dipilih
-                accessCodeInput.value = selectedCode;
-                accessCodeInput.readonly = true;
-                accessCodeInput.style.backgroundColor = '#f9f9f9';
-            } else {
-                // Reset jika tidak ada yang dipilih
-                accessCodeInput.value = '';
-                accessCodeInput.readonly = true;
-                accessCodeInput.style.backgroundColor = '#f9f9f9';
-            }
-        });
-
-        // Event listener untuk form submit
-        document.getElementById('loginForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const penyuluhName = document.getElementById('penyuluhName').value;
-            const accessCode = document.getElementById('accessCode').value;
-            
-            if (penyuluhName && accessCode) {
-                alert(`Login berhasil!\nNama: ${document.getElementById('penyuluhName').options[document.getElementById('penyuluhName').selectedIndex].text}\nKode Akses: ${accessCode}`);
-            } else {
-                alert('Silakan pilih nama penyuluh terlebih dahulu!');
-            }
-        });
-    </script>
 
   <script>
     // Configuration
@@ -426,6 +419,22 @@
       userSessionKey: 'ltt_user_session',
       adminSessionKey: 'ltt_admin_session'
     };
+
+    // Event listener untuk dropdown nama penyuluh
+    document.getElementById('penyuluhName').addEventListener('change', function() {
+      const selectedCode = this.value;
+      const accessCodeInput = document.getElementById('accessCode');
+      
+      if (selectedCode) {
+        // Isi kode akses dengan value yang dipilih
+        accessCodeInput.value = selectedCode;
+        accessCodeInput.style.backgroundColor = '#f8f9fa';
+      } else {
+        // Reset jika tidak ada yang dipilih
+        accessCodeInput.value = '';
+        accessCodeInput.style.backgroundColor = '#f8f9fa';
+      }
+    });
 
     // Tab switching - FIXED
     function switchTab(tabType) {
@@ -490,11 +499,11 @@
       e.preventDefault();
       clearErrors();
       
-      const accessCode = document.getElementById('userAccessCode').value.trim();
-      const penyuluhName = document.getElementById('userPenyuluhName').value;
+      const accessCode = document.getElementById('accessCode').value.trim();
+      const penyuluhName = document.getElementById('penyuluhName').value;
       
       if (!accessCode || !penyuluhName) {
-        showError('user', 'Semua field harus diisi');
+        showError('user', 'Silakan pilih nama penyuluh terlebih dahulu');
         return;
       }
       
@@ -514,12 +523,12 @@
         const result = await response.json();
         
         if (result.success) {
-          // FIXED: Save USER session to USER sessionKey
+          // Save USER session to USER sessionKey
           localStorage.setItem(CONFIG.userSessionKey, JSON.stringify(result.session));
           
           showSuccess('user', 'Login berhasil! Mengalihkan ke halaman utama...');
           
-          // FIXED: Redirect to index.html for users
+          // Redirect to index.html for users
           setTimeout(() => {
             window.location.href = 'index.html';
           }, 2000);
@@ -563,12 +572,12 @@
         const result = await response.json();
         
         if (result.success) {
-          // FIXED: Save ADMIN session to ADMIN sessionKey
+          // Save ADMIN session to ADMIN sessionKey
           localStorage.setItem(CONFIG.adminSessionKey, JSON.stringify(result.session));
           
           showSuccess('admin', 'Login admin berhasil! Mengalihkan ke panel admin...');
           
-          // FIXED: Redirect to admin.html for admins
+          // Redirect to admin.html for admins
           setTimeout(() => {
             window.location.href = 'admin.html';
           }, 2000);
@@ -697,8 +706,8 @@
     function fillDemoData() {
       if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
         // Only in development
-        document.getElementById('userAccessCode').value = 'PPL001';
-        document.getElementById('userPenyuluhName').value = 'A.PURNAMA PUTRA';
+        document.getElementById('penyuluhName').value = 'PURNAMA';
+        document.getElementById('accessCode').value = 'PURNAMA';
         document.getElementById('adminAccessCode').value = 'ADMIN001';
       }
     }
@@ -707,7 +716,7 @@
     window.addEventListener('beforeunload', function() {
       // Clear password fields
       document.getElementById('adminAccessCode').value = '';
-      document.getElementById('userAccessCode').value = '';
+      document.getElementById('accessCode').value = '';
     });
 
     // Prevent right-click and F12 in production (optional security measure)
