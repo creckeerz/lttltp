@@ -246,104 +246,102 @@
       <div id="userSuccess" class="login-success"></div>
       
       <form id="userForm">
-        <div class="form-group">
-          <label>Kode Akses User</label>
-          <input type="text" id="userAccessCode" placeholder="Masukkan kode akses user" required />
-        </div>
+         <div class="form-group">
+                <label for="accessCode">Kode Akses</label>
+                <input type="text" id="accessCode" placeholder="Pilih nama penyuluh terlebih dahulu" readonly />
         
-        <div class="form-group">
-          <label>Nama Penyuluh</label>
-          <select id="userPenyuluhName" required>
-            <option value="">-- Pilih Nama Penyuluh --</option>
-            <option>A.PURNAMA PUTRA</option>
-            <option>AAN PUJINURINSAN</option>
-            <option>ABDUL RAHMAN</option>
-            <option>AGUS SAIFUDDIN</option>
-            <option>AGUSMANTO</option>
-            <option>AHADI</option>
-            <option>ALMIZAN</option>
-            <option>ALWAN SASRUDIN</option>
-            <option>ANDI</option>
-            <option>ANDI WIHARDI</option>
-            <option>ANDI WILLIAM</option>
-            <option>ANTO SAPUTRA</option>
-            <option>ARAMIYA</option>
-            <option>BUDI SETIAWAN</option>
-            <option>DARMA IRAWAN</option>
-            <option>DARMADI</option>
-            <option>DARUSSALAM</option>
-            <option>DINO</option>
-            <option>DIYANTO</option>
-            <option>EDI WAHYUDI</option>
-            <option>EDWARDI</option>
-            <option>EKO SURYONO</option>
-            <option>ELYA KANDAU</option>
-            <option>EMELDA</option>
-            <option>ESPAHANI</option>
-            <option>FITRIANI</option>
-            <option>FREEADI</option>
-            <option>HENGKY KUSUMA INDRA</option>
-            <option>HERY PRAMONO</option>
-            <option>IBNU ROSIHAN</option>
-            <option>IMANSYAH</option>
-            <option>IRLAH</option>
-            <option>IWAN APRIANTO</option>
-            <option>JAKA SUBHAN</option>
-            <option>JAWARI</option>
-            <option>JAYA HARTO</option>
-            <option>JUANDA</option>
-            <option>JUANDI</option>
-            <option>JUMIATI</option>
-            <option>KAMRAN</option>
-            <option>KARNILA</option>
-            <option>K.BUDIMAN</option>
-            <option>LILI SINTA RUSTIKA</option>
-            <option>MARNI</option>
-            <option>MUHAMMAD IRHAMSYAH</option>
-            <option>MUHAMMAD SAHADI</option>
-            <option>MULYADI</option>
-            <option>MURNI HADI</option>
-            <option>MURNIATI</option>
-            <option>NAZRULLAH</option>
-            <option>NEVI ARYATI</option>
-            <option>NIRLAWATI</option>
-            <option>NINING MUSWANI</option>
-            <option>NOVI YANA</option>
-            <option>NURLENA</option>
-            <option>NURHAYATI</option>
-            <option>NUR LAILA SARI</option>
-            <option>RAKHMAD BURHAN</option>
-            <option>RENA</option>
-            <option>RIAN PRASOJO</option>
-            <option>RIZA NOVINA</option>
-            <option>ROMI</option>
-            <option>RONA NURBAYA</option>
-            <option>RUSDIANSYAH</option>
-            <option>SAMTIDAR</option>
-            <option>SAR'ANI</option>
-            <option>SARTINI</option>
-            <option>SAPTINO</option>
-            <option>STEPHANUS PUJI SETIAWAN</option>
-            <option>SUHAIMI</option>
-            <option>SUDARTO</option>
-            <option>SUMIATI</option>
-            <option>SUPARJO</option>
-            <option>SURIYANTO</option>
-            <option>TAUPIT</option>
-            <option>TEGUH PRIONO</option>
-            <option>TULUS PRIADI</option>
-            <option>U. NASHIRUDDIN</option>
-            <option>VOLENDI</option>
-            <option>WAHIDAH</option>
-            <option>WINARDI</option>
-            <option>WIWIT</option>
-            <option>YANTI</option>
-            <option>YENI DARMILA</option>
-            <option>YUNIA</option>
-            <option>YUSNANI</option>
-            <option>ZULPIANA</option>
-          </select>
-        </div>
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="penyuluhName">Nama Penyuluh</label>
+                <select id="penyuluhName" required>
+                    <option value="">-- Pilih Nama Penyuluh --</option>
+                    <option value="PURNAMA">A.PURNAMA PUTRA</option>
+                    <option value="AAN">AAN PUJINURINSAN</option>
+                    <option value="ABDUL">ABDUL RAHMAN</option>
+                    <option value="AGUS">AGUS SAIFUDDIN</option>
+                    <option value="AGUSMANTO">AGUSMANTO</option>
+                    <option value="AHADI">AHADI</option>
+                    <option value="ALMIZAN">ALMIZAN</option>
+                    <option value="ALWAN">ALWAN SASRUDIN</option>
+                    <option value="ANDI">ANDI</option>
+                    <option value="ANDIWIHARDI">ANDI WIHARDI</option>
+                    <option value="ANDIWILLIAM">ANDI WILLIAM</option>
+                    <option value="ANTO">ANTO SAPUTRA</option>
+                    <option value="ARAMIYA">ARAMIYA</option>
+                    <option value="BUDISETIAWAN">BUDI SETIAWAN</option>
+                    <option value="DARMA">DARMA IRAWAN</option>
+                    <option value="DARUSSALAM">DARUSSALAM</option>
+                    <option value="DINO">DINO</option>
+                    <option value="DIYANTO">DIYANTO</option>
+                    <option value="EDI">EDI WAHYUDI</option>
+                    <option value="EDWARDI">EDWARDI</option>
+                    <option value="EKO">EKO SURYONO</option>
+                    <option value="ELYA">ELYA KANDAU</option>
+                    <option value="EMELDA">EMELDA</option>
+                    <option value="ESPAHANI">ESPAHANI</option>
+                    <option value="FITRIANI">FITRIANI</option>
+                    <option value="FREEADI">FREEADI</option>
+                    <option value="HENGKY">HENGKY KUSUMA INDRA</option>
+                    <option value="HERY">HERY PRAMONO</option>
+                    <option value="IBNU">IBNU ROSIHAN</option>
+                    <option value="IMANSYAH">IMANSYAH</option>
+                    <option value="IRLAH">IRLAH</option>
+                    <option value="IWAN">IWAN APRIANTO</option>
+                    <option value="JAKA">JAKA SUBHAN</option>
+                    <option value="JAWARI">JAWARI</option>
+                    <option value="JAYAHARTO">JAYA HARTO</option>
+                    <option value="JUANDA">JUANDA</option>
+                    <option value="JUANDI">JUANDI</option>
+                    <option value="JUMIATI">JUMIATI</option>
+                    <option value="KAMRAN">KAMRAN</option>
+                    <option value="KARNILA">KARNILA</option>
+                    <option value="BUDIMAN">K.BUDIMAN</option>
+                    <option value="LILI">LILI SINTA RUSTIKA</option>
+                    <option value="MARNI">MARNI</option>
+                    <option value="IRHAMSYAH">MUHAMMAD IRHAMSYAH</option>
+                    <option value="SAHADI">MUHAMMAD SAHADI</option>
+                    <option value="MULYADI">MULYADI</option>
+                    <option value="MURNI">MURNI HADI</option>
+                    <option value="MURNIATI">MURNIATI</option>
+                    <option value="NAZRULLAH">NAZRULLAH</option>
+                    <option value="NEVI">NEVI ARYATI</option>
+                    <option value="NIRLAWATI">NIRLAWATI</option>
+                    <option value="NINING">NINING MUSWANI</option>
+                    <option value="NOVIYANA">NOVI YANA</option>
+                    <option value="NURLENA">NURLENA</option>
+                    <option value="NURHAYATI">NURHAYATI</option>
+                    <option value="NURLAILA">NUR LAILA SARI</option>
+                    <option value="RAKHMAD">RAKHMAD BURHAN</option>
+                    <option value="RENA">RENA</option>
+                    <option value="RIAN">RIAN PRASOJO</option>
+                    <option value="RIZA">RIZA NOVINA</option>
+                    <option value="ROMI">ROMI</option>
+                    <option value="RONA">RONA NURBAYA</option>
+                    <option value="RUSDIANSYAH">RUSDIANSYAH</option>
+                    <option value="SAMTIDAR">SAMTIDAR</option>
+                    <option value="SARANI">SAR'ANI</option>
+                    <option value="SARTINI">SARTINI</option>
+                    <option value="SAPTINO">SAPTINO</option>
+                    <option value="STEPHANUS">STEPHANUS PUJI SETIAWAN</option>
+                    <option value="SUHAIMI">SUHAIMI</option>
+                    <option value="SUDARTO">SUDARTO</option>
+                    <option value="SUMIATI">SUMIATI</option>
+                    <option value="SUPARJO">SUPARJO</option>
+                    <option value="SURIYANTO">SURIYANTO</option>
+                    <option value="TAUPIT">TAUPIT</option>
+                    <option value="TEGUH">TEGUH PRIONO</option>
+                    <option value="TULUS">TULUS PRIADI</option>
+                    <option value="NASHIRUDDIN">U. NASHIRUDDIN</option>
+                    <option value="VOLENDI">VOLENDI</option>
+                    <option value="WINARDI">WINARDI</option>
+                    <option value="WIWIT">WIWIT</option>
+                    <option value="YANTI">YANTI</option>
+                    <option value="YENI">YENI DARMILA</option>
+                    <option value="YUNIA">YUNIA</option>
+                    <option value="YUSNANI">YUSNANI</option>
+                    <option value="ZULPIANA">ZULPIANA</option>
+                </select>
+            </div>
         
         <button type="submit" class="login-btn">🚀 Login sebagai User</button>
       </form>
@@ -385,6 +383,41 @@
       <p>• Offline Support: Tersedia</p>
     </div>
   </div>
+  
+  
+  <script>
+        // Event listener untuk dropdown nama penyuluh
+        document.getElementById('penyuluhName').addEventListener('change', function() {
+            const selectedCode = this.value;
+            const accessCodeInput = document.getElementById('accessCode');
+            
+            if (selectedCode) {
+                // Isi kode akses dengan value yang dipilih
+                accessCodeInput.value = selectedCode;
+                accessCodeInput.readonly = true;
+                accessCodeInput.style.backgroundColor = '#f9f9f9';
+            } else {
+                // Reset jika tidak ada yang dipilih
+                accessCodeInput.value = '';
+                accessCodeInput.readonly = true;
+                accessCodeInput.style.backgroundColor = '#f9f9f9';
+            }
+        });
+
+        // Event listener untuk form submit
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const penyuluhName = document.getElementById('penyuluhName').value;
+            const accessCode = document.getElementById('accessCode').value;
+            
+            if (penyuluhName && accessCode) {
+                alert(`Login berhasil!\nNama: ${document.getElementById('penyuluhName').options[document.getElementById('penyuluhName').selectedIndex].text}\nKode Akses: ${accessCode}`);
+            } else {
+                alert('Silakan pilih nama penyuluh terlebih dahulu!');
+            }
+        });
+    </script>
 
   <script>
     // Configuration
