@@ -427,7 +427,91 @@
       font-weight: 600;
     }
 
-    
+    /* Login form styles */
+    .login-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      z-index: 20000;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .login-form {
+      background: white;
+      padding: 40px;
+      border-radius: 20px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+      max-width: 400px;
+      width: 90%;
+      text-align: center;
+    }
+
+    .login-form h2 {
+      color: #2c3e50;
+      margin-bottom: 30px;
+      font-size: 28px;
+    }
+
+    .login-form .form-group {
+      margin-bottom: 20px;
+      text-align: left;
+    }
+
+    .login-form label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
+      color: #34495e;
+    }
+
+    .login-form input,
+    .login-form select {
+      width: 100%;
+      padding: 12px;
+      border: 2px solid #e1e8ed;
+      border-radius: 8px;
+      font-size: 14px;
+      transition: border-color 0.3s ease;
+    }
+
+    .login-form input:focus,
+    .login-form select:focus {
+      outline: none;
+      border-color: #3498db;
+      box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+    }
+
+    .login-btn {
+      width: 100%;
+      padding: 15px;
+      background: linear-gradient(135deg, #3498db, #2980b9);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.3s ease;
+    }
+
+    .login-btn:hover {
+      transform: translateY(-2px);
+    }
+
+    .login-error {
+      background: #e74c3c;
+      color: white;
+      padding: 10px;
+      border-radius: 6px;
+      margin-bottom: 20px;
+      display: none;
+    }
+
     .admin-link {
       margin-top: 20px;
       color: #7f8c8d;
@@ -472,7 +556,155 @@
   </style>
 </head>
 <body>
+  <!-- Login Container -->
+  <div id="loginContainer" class="login-container">
+    <div class="login-form">
+      <h2>🔐 Login Sistem</h2>
+      <div id="loginError" class="login-error"></div>
+      
+      <form id="loginForm">
+            <div class="form-group">
+                <label for="penyuluhName">Nama Penyuluh</label>
+                <select id="penyuluhName" required>
+                    <option value="">-- Pilih Nama Penyuluh --</option>
+                    <option value="PURNAMA">A.PURNAMA PUTRA</option>
+                    <option value="AAN">AAN PUJINURINSAN</option>
+                    <option value="ABDUL">ABDUL RAHMAN</option>
+                    <option value="AGUS">AGUS SAIFUDDIN</option>
+                    <option value="AGUSMANTO">AGUSMANTO</option>
+                    <option value="AHADI">AHADI</option>
+                    <option value="ALMIZAN">ALMIZAN</option>
+                    <option value="ALWAN">ALWAN SASRUDIN</option>
+                    <option value="ANDI">ANDI</option>
+                    <option value="ANDIWIHARDI">ANDI WIHARDI</option>
+                    <option value="ANDIWILLIAM">ANDI WILLIAM</option>
+                    <option value="ANTO">ANTO SAPUTRA</option>
+                    <option value="ARAMIYA">ARAMIYA</option>
+                    <option value="BUDISETIAWAN">BUDI SETIAWAN</option>
+                    <option value="DARMA">DARMA IRAWAN</option>
+                    <option value="DARUSSALAM">DARUSSALAM</option>
+                    <option value="DINO">DINO</option>
+                    <option value="DIYANTO">DIYANTO</option>
+                    <option value="EDI">EDI WAHYUDI</option>
+                    <option value="EDWARDI">EDWARDI</option>
+                    <option value="EKO">EKO SURYONO</option>
+                    <option value="ELYA">ELYA KANDAU</option>
+                    <option value="EMELDA">EMELDA</option>
+                    <option value="ESPAHANI">ESPAHANI</option>
+                    <option value="FITRIANI">FITRIANI</option>
+                    <option value="FREEADI">FREEADI</option>
+                    <option value="HENGKY">HENGKY KUSUMA INDRA</option>
+                    <option value="HERY">HERY PRAMONO</option>
+                    <option value="IBNU">IBNU ROSIHAN</option>
+                    <option value="IMANSYAH">IMANSYAH</option>
+                    <option value="IRLAH">IRLAH</option>
+                    <option value="IWAN">IWAN APRIANTO</option>
+                    <option value="JAKA">JAKA SUBHAN</option>
+                    <option value="JAWARI">JAWARI</option>
+                    <option value="JAYAHARTO">JAYA HARTO</option>
+                    <option value="JUANDA">JUANDA</option>
+                    <option value="JUANDI">JUANDI</option>
+                    <option value="JUMIATI">JUMIATI</option>
+                    <option value="KAMRAN">KAMRAN</option>
+                    <option value="KARNILA">KARNILA</option>
+                    <option value="BUDIMAN">K.BUDIMAN</option>
+                    <option value="LILI">LILI SINTA RUSTIKA</option>
+                    <option value="MARNI">MARNI</option>
+                    <option value="IRHAMSYAH">MUHAMMAD IRHAMSYAH</option>
+                    <option value="SAHADI">MUHAMMAD SAHADI</option>
+                    <option value="MULYADI">MULYADI</option>
+                    <option value="MURNI">MURNI HADI</option>
+                    <option value="MURNIATI">MURNIATI</option>
+                    <option value="NAZRULLAH">NAZRULLAH</option>
+                    <option value="NEVI">NEVI ARYATI</option>
+                    <option value="NIRLAWATI">NIRLAWATI</option>
+                    <option value="NINING">NINING MUSWANI</option>
+                    <option value="NOVIYANA">NOVI YANA</option>
+                    <option value="NURLENA">NURLENA</option>
+                    <option value="NURHAYATI">NURHAYATI</option>
+                    <option value="NURLAILA">NUR LAILA SARI</option>
+                    <option value="RAKHMAD">RAKHMAD BURHAN</option>
+                    <option value="RENA">RENA</option>
+                    <option value="RIAN">RIAN PRASOJO</option>
+                    <option value="RIZA">RIZA NOVINA</option>
+                    <option value="ROMI">ROMI</option>
+                    <option value="RONA">RONA NURBAYA</option>
+                    <option value="RUSDIANSYAH">RUSDIANSYAH</option>
+                    <option value="SAMTIDAR">SAMTIDAR</option>
+                    <option value="SARANI">SAR'ANI</option>
+                    <option value="SARTINI">SARTINI</option>
+                    <option value="SAPTINO">SAPTINO</option>
+                    <option value="STEPHANUS">STEPHANUS PUJI SETIAWAN</option>
+                    <option value="SUHAIMI">SUHAIMI</option>
+                    <option value="SUDARTO">SUDARTO</option>
+                    <option value="SUMIATI">SUMIATI</option>
+                    <option value="SUPARJO">SUPARJO</option>
+                    <option value="SURIYANTO">SURIYANTO</option>
+                    <option value="TAUPIT">TAUPIT</option>
+                    <option value="TEGUH">TEGUH PRIONO</option>
+                    <option value="TULUS">TULUS PRIADI</option>
+                    <option value="NASHIRUDDIN">U. NASHIRUDDIN</option>
+                    <option value="VOLENDI">VOLENDI</option>
+                    <option value="WINARDI">WINARDI</option>
+                    <option value="WIWIT">WIWIT</option>
+                    <option value="YANTI">YANTI</option>
+                    <option value="YENI">YENI DARMILA</option>
+                    <option value="YUNIA">YUNIA</option>
+                    <option value="YUSNANI">YUSNANI</option>
+                    <option value="ZULPIANA">ZULPIANA</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="accessCode">Kode Akses</label>
+                <input type="text" id="accessCode" placeholder="Pilih nama penyuluh terlebih dahulu" readonly />
+                <div class="info-text">Kode akses akan otomatis terisi setelah memilih nama penyuluh</div>
+            </div>
+            
+            
+        <button type="submit" class="login-btn">🚀 Login</button>
+      </form>
+      
+      <div class="admin-link">
+        <a href="#" onclick="switchToAdminLogin()">Login sebagai Admin</a>
+      </div>
+    </div>
+  </div>
 
+
+<script>
+        // Event listener untuk dropdown nama penyuluh
+        document.getElementById('penyuluhName').addEventListener('change', function() {
+            const selectedCode = this.value;
+            const accessCodeInput = document.getElementById('accessCode');
+            
+            if (selectedCode) {
+                // Isi kode akses dengan value yang dipilih
+                accessCodeInput.value = selectedCode;
+                accessCodeInput.readonly = true;
+                accessCodeInput.style.backgroundColor = '#f9f9f9';
+            } else {
+                // Reset jika tidak ada yang dipilih
+                accessCodeInput.value = '';
+                accessCodeInput.readonly = true;
+                accessCodeInput.style.backgroundColor = '#f9f9f9';
+            }
+        });
+
+        // Event listener untuk form submit
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const penyuluhName = document.getElementById('penyuluhName').value;
+            const accessCode = document.getElementById('accessCode').value;
+            
+            if (penyuluhName && accessCode) {
+                alert(`Login berhasil!\nNama: ${document.getElementById('penyuluhName').options[document.getElementById('penyuluhName').selectedIndex].text}\nKode Akses: ${accessCode}`);
+            } else {
+                alert('Silakan pilih nama penyuluh terlebih dahulu!');
+            }
+        });
+    </script>
 
   <!-- Auth Protection Overlay -->
   <div id="authProtection" class="auth-protection" style="display: none;">
